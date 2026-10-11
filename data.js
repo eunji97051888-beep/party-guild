@@ -54,7 +54,14 @@ window.PARTY_DEFAULT = {
       "type": "낙화의 전장"
     }
   ],
-  "notices": [],
+  "notices": [
+    {
+      "title": "테스트",
+      "body": "테스트 공지입니다",
+      "date": "2026-10-12",
+      "pinned": true
+    }
+  ],
   "resources": [],
   "videos": [
     {
