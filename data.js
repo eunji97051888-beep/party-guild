@@ -53,5 +53,13 @@ window.PARTY_DEFAULT = {
       "name": "요화선녀",
       "type": "낙화의 전장"
     }
+  ],
+  "notices": [],
+  "resources": [],
+  "videos": [
+    {
+      "title": "광역 사냥",
+      "id": "idv31zdxnz4"
+    }
   ]
 };
