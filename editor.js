@@ -42,7 +42,7 @@
  if(!quoteTitle){report('문파 안내 상자의 큰 글씨를 입력해 줘.',$('quoteTitleInput'));return}
  const notices=[...$('noticeRows').children].map(el=>({title:el.querySelector('.notice-title').value.trim(),body:el.querySelector('.notice-body').value.trim(),date:el.querySelector('.notice-date').value,pinned:el.querySelector('.notice-pinned').checked}));
  if(notices.some(n=>!n.title||!n.body)){report('제목이나 내용이 빈 공지가 있어. 입력하거나 삭제해 줘.',$('noticeRows'));return}
- const resources=gatherItems('link');const enteredVideos=gatherItems('video');
+ const resources=gatherItems('linkRows');const enteredVideos=gatherItems('videoRows');
  if(resources.some(x=>!x.title||!validHttpUrl(x.url))){report('자료실에 제목이 비었거나 주소가 잘못된 항목이 있어.',$('linkRows'));return}
  if(enteredVideos.some(x=>!x.title||!youtubeId(x.url))){report('유튜브 제목이나 주소가 잘못됐어. 유튜브 영상 주소의 v= 뒤 11자리 ID도 확인해 줘.',$('videoRows'));return}
  const videos=enteredVideos.map(x=>({title:x.title,id:youtubeId(x.url)}));
