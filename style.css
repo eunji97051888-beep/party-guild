@@ -92,3 +92,15 @@
   }
   .hero-stage::before {display:none !important;content:none !important;}
 }
+
+/* V9 announcement management; existing banner and desktop background untouched */
+.guild-announcements{margin-top:18px}
+.notice-items{display:grid;gap:11px;margin-top:20px}
+.notice-entry{padding:18px 20px;border-radius:10px;background:#24304b;border:1px solid #405172}
+.notice-entry-heading{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.notice-entry h4{font-size:16px;margin:0;font-weight:700;color:#f4f0e9}
+.notice-entry time{margin-left:auto;color:#aebad2;font-size:12px}
+.notice-entry p{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;color:#d5deef;line-height:1.9;margin:12px 0 0}
+.notice-pin{font-size:11px;font-weight:800;background:#f0c889;color:#1a2640;padding:4px 8px;border-radius:5px}
+.notice-empty{margin:0;padding:25px;text-align:center;color:#b4c1dc;background:#23304b;border-radius:10px}
+@media(max-width:720px){.guild-announcements{margin-top:12px}.notice-entry{padding:15px}.notice-entry time{margin-left:0;width:100%}}

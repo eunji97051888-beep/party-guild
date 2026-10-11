@@ -1,13 +1,32 @@
 (() => {'use strict';const $=id=>document.getElementById(id),days=['일','월','화','수','목','금','토'];const original=JSON.parse(JSON.stringify(window.PARTY_DEFAULT));const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));let currentPreview=null;
  function row(e={days:[1],time:'20:00',name:'',type:'문파 콘텐츠'}){let el=document.createElement('div');el.className='row-edit';el.innerHTML=`<input type="time" class="time" aria-label="시간" value="${escape(e.time)}"><input class="name" aria-label="콘텐츠 이름" placeholder="콘텐츠 이름" value="${escape(e.name)}"><input class="kind" aria-label="종류" placeholder="종류" value="${escape(e.type)}"><button type="button" class="action danger delete">삭제</button><div class="week-check">${days.map((d,i)=>`<label><input type="checkbox" value="${i}" ${e.days?.includes(i)?'checked':''}> ${d}요일</label>`).join('')}</div>`;el.querySelector('.delete').onclick=()=>el.remove();$('rows').append(el)}
+
+ function noticeRow(n={title:'',body:'',date:'',pinned:false}){
+   const el=document.createElement('div');el.className='notice-edit-card';
+   el.innerHTML='<div class="notice-edit-head"><strong>공지사항</strong><button type="button" class="action danger notice-delete">삭제</button></div>'
+      +'<div class="field"><label>제목</label><input class="notice-title" maxlength="100" placeholder="공지 제목" style="width:100%"></div>'
+      +'<div class="field"><label>내용</label><textarea class="notice-body" maxlength="3000" rows="4" placeholder="공지 내용"></textarea></div>'
+      +'<div class="notice-edit-options"><label>게시 날짜 <input type="date" class="notice-date"></label>'
+      +'<label><input type="checkbox" class="notice-pinned"> 맨 위 고정 (중요)</label></div>';
+   el.querySelector('.notice-title').value=n.title||'';
+   el.querySelector('.notice-body').value=n.body||'';
+   el.querySelector('.notice-date').value=n.date||'';
+   el.querySelector('.notice-pinned').checked=!!n.pinned;
+   el.querySelector('.notice-delete').onclick=()=>{if(confirm('이 공지를 삭제할까?'))el.remove()};
+   $('noticeRows').append(el);
+ }
+ $('addNotice').onclick=()=>noticeRow({date:new Date().toLocaleDateString('en-CA')});
+
  function populate(){document.querySelector('#rows').replaceChildren();$('note').value=original.note;
  $('quoteTitleInput').value=original.quoteTitle??'함께 즐기고 웃는 우리 문파';
- $('quoteSubtitleInput').value=original.quoteSubtitle??'✦ 즐거운 게임, 배려하는 소통 ✦';original.events.forEach(row)}populate();$('add').onclick=()=>row();$('reset').onclick=()=>{if(confirm('현재 파일에 저장된 기본 일정으로 되돌릴까?')){populate();$('status').textContent='기본 일정으로 되돌렸어.'}};
+ $('quoteSubtitleInput').value=original.quoteSubtitle??'✦ 즐거운 게임, 배려하는 소통 ✦';original.events.forEach(row);$('noticeRows').replaceChildren();(original.notices||[]).forEach(noticeRow)}populate();$('add').onclick=()=>row();$('reset').onclick=()=>{if(confirm('현재 파일에 저장된 기본 일정으로 되돌릴까?')){populate();$('status').textContent='기본 일정으로 되돌렸어.'}};
  const download=(name,blob)=>{const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000)};
  $('exportData').onclick=()=>{const events=[...$('rows').children].map(el=>({days:[...el.querySelectorAll('input[type=checkbox]:checked')].map(x=>Number(x.value)),time:el.querySelector('.time').value,name:el.querySelector('.name').value.trim(),type:el.querySelector('.kind').value.trim()}));if(events.some(x=>!x.time||!x.name||!x.type||!x.days.length)){alert('각 일정에 시간, 이름, 종류, 요일을 모두 입력해 줘.');return}const quoteTitle=$('quoteTitleInput').value.trim();
  const quoteSubtitle=$('quoteSubtitleInput').value.trim();
  if(!quoteTitle){alert('문파 안내 상자 큰 글씨를 입력해 줘.');return}
- const data={quoteTitle,quoteSubtitle,note:$('note').value.trim(),image:'weekly.png',events};const js='window.PARTY_DEFAULT = '+JSON.stringify(data,null,2)+';\n';download('data.js',new Blob([js],{type:'text/javascript;charset=utf-8'}));$('status').textContent='data.js 다운로드 완료! 이제 GitHub에 이 파일을 올리면 돼.'};
+ const notices=[...$('noticeRows').children].map(el=>({title:el.querySelector('.notice-title').value.trim(),body:el.querySelector('.notice-body').value.trim(),date:el.querySelector('.notice-date').value,pinned:el.querySelector('.notice-pinned').checked}));
+ if(notices.some(n=>!n.title||!n.body)){alert('모든 공지사항에 제목과 내용을 입력해 줘. 빈 공지는 삭제하면 돼.');return}
+ const data={quoteTitle,quoteSubtitle,note:$('note').value.trim(),image:'weekly.png',notices,events};const js='window.PARTY_DEFAULT = '+JSON.stringify(data,null,2)+';\n';download('data.js',new Blob([js],{type:'text/javascript;charset=utf-8'}));$('status').textContent='data.js 다운로드 완료! 이제 GitHub에 이 파일을 올리면 돼.'};
  $('imageFile').onchange=()=>{let f=$('imageFile').files?.[0];if(currentPreview)URL.revokeObjectURL(currentPreview);if(!f){$('exportImage').disabled=true;return}if(!['image/png','image/jpeg','image/webp'].includes(f.type)||f.size>15*1024*1024){alert('15MB 이하 PNG/JPG/WEBP 이미지로 선택해 줘.');$('imageFile').value='';return}currentPreview=URL.createObjectURL(f);$('preview').src=currentPreview;$('exportImage').disabled=false};
  $('exportImage').onclick=async()=>{try{const f=$('imageFile').files?.[0];if(!f)return;const bitmap=await createImageBitmap(f);const canvas=document.createElement('canvas');canvas.width=bitmap.width;canvas.height=bitmap.height;const ctx=canvas.getContext('2d');ctx.drawImage(bitmap,0,0);bitmap.close();canvas.toBlob(blob=>{if(!blob){alert('이미지 변환에 실패했어.');return}download('weekly.png',blob);$('status').textContent='weekly.png 다운로드 완료! GitHub에 업로드해 줘.'},'image/png')}catch(e){alert('이미지 처리 실패: '+e.message)}};
 })();
