@@ -60,6 +60,12 @@ window.PARTY_DEFAULT = {
       "body": "테스트 공지입니다",
       "date": "2026-10-12",
       "pinned": true
+    },
+    {
+      "title": "테스트2",
+      "body": "테스트 공지2 입니다",
+      "date": "2026-10-12",
+      "pinned": false
     }
   ],
   "resources": [],
