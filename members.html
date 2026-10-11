@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>파티 문파 | 출석 관리</title><link rel="stylesheet" href="members.css?v=11"></head><body>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>파티 문파 | 출석 관리</title><link rel="stylesheet" href="members.css?v=11-2"></head><body>
 <header class="bar"><div class="bar-inner"><a class="back" href="admin.html">← 관리자 화면</a><div class="brand">파티 <small>PARTY · ATTENDANCE</small></div><a class="back" href="index.html">홈페이지 ↗</a></div></header>
 <main class="shell"><div class="heading"><div><span class="eyebrow">GUILD MASTER TOOLS · V11</span><h1>문파원 · 콘텐츠 출석 관리</h1><p>문파원 변경 이력을 보존하면서 콘텐츠 회차별 출석을 관리해.</p></div></div>
 <div class="warning"><b>저장 방식 안내</b> · 이 페이지의 기록은 현재 브라우저에만 저장돼. 공개 GitHub에는 자동으로 올라가지 않아. PC를 바꾸거나 브라우저 데이터를 삭제하기 전에 반드시 <b>JSON 백업 다운로드</b>를 눌러 보관해. 관리자 비밀번호가 없는 페이지이므로 공용 컴퓨터에서는 사용하지 않는 걸 추천해.</div>
@@ -13,5 +13,5 @@
 <section class="panel"><div class="panelhead"><div><span class="eyebrow">ATTENDANCE CHECK</span><h2>출석 체크</h2></div><span id="currentSessionLabel" class="pill">회차를 선택해 줘</span></div>
 <p class="help">상태: <b>참석</b> / <b>불참</b> / <b>제외</b> / <b>미입력</b>. 제외는 출석률 계산에서 분모에 포함하지 않아.</p><div id="attendanceArea"></div></section>
 <section class="panel"><div class="panelhead"><div><span class="eyebrow">SUMMARY</span><h2>문파원별 출석 통계</h2></div></div><div class="tablewrap"><table><thead><tr><th>문파원</th><th>참석</th><th>불참</th><th>제외</th><th>미입력</th><th>출석률</th></tr></thead><tbody id="statsBody"></tbody></table></div><p class="help">출석률 = 참석 ÷ (참석 + 불참) × 100. 아직 기록하지 않은 회차는 계산에서 제외돼. V12 보상 분배 기능은 여기서 보존한 고유 문파원 ID를 활용할 예정이야.</p></section>
-<section class="panel" id="contentStatistics"><div class="panelhead"><div><span class="eyebrow">CONTENT-BY-CONTENT SUMMARY</span><h2>콘텐츠별 출석 통계</h2></div></div><p class="help">요신토벌령 · 결계지방어 · 미혹의 정원 · 신기 쟁탈전 통계를 각각 확인해. 위의 전체 통계와 계산 기준은 같아.</p><div id="contentStats" class="content-stats-grid"></div></section>
-</main><script src="members.js?v=11-stats1"></script></body></html>
+<section class="panel" id="contentStatistics"><div class="panelhead"><div><span class="eyebrow">CONTENT-BY-CONTENT SUMMARY</span><h2>콘텐츠별 출석 통계</h2></div></div><p class="help">요신토벌령 · 결계지방어 · 미혹의 정원 · 신기 쟁탈전 통계를 각각 확인해. 위의 전체 통계와 계산 기준은 같아. 각 콘텐츠 아래쪽 화살표로 회차별 출석 명단도 확인할 수 있어.</p><div id="contentStats" class="content-stats-grid"></div></section>
+</main><script src="members.js?v=11-2"></script></body></html>

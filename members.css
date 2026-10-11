@@ -7,3 +7,18 @@
 .content-stat-card table{min-width:440px;font-size:12px}
 .content-stat-card th,.content-stat-card td{padding:9px 7px}
 @media(max-width:950px){.content-stats-grid{grid-template-columns:1fr}}
+
+/* V11.2: 콘텐츠별 회차 이동식 상세 명단 */
+.round-details{border-top:1px solid #53607a;margin-top:17px;padding-top:16px}
+.round-nav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.round-current{display:flex;flex-direction:column;gap:4px;text-align:center;min-width:0}
+.round-current strong{color:#f5d49c;font-size:17px}
+.round-current small{color:#b9c7db;font-size:11px;overflow-wrap:anywhere}
+.round-btn{min-width:84px}
+.round-table{min-width:300px;font-size:13px}
+.round-table th,.round-table td{padding:10px 12px}
+.attendance-state{font-weight:800;font-size:11px;padding:5px 10px;border-radius:6px;display:inline-block}
+.state-present{background:#1d584d;color:#a3f3ce}.state-absent{background:#643b46;color:#ffd0d3}
+.state-exempt{background:#4c4762;color:#ddd3ff}.state-missing{background:#39445b;color:#c2cce0}
+.round-totals{color:#b9c7db;font-size:11px;margin:12px 0 0}
+@media(max-width:500px){.round-btn{min-width:67px;padding:9px 8px}.round-current strong{font-size:14px}}

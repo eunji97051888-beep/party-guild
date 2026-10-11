@@ -2,7 +2,7 @@
 const KEY='party-guild-v11-attendance';const $=id=>document.getElementById(id);
 const CONTENTS=['요신토벌령','결계지방어','미혹의 정원','신기 쟁탈전'];
 const EMPTY=()=>({version:1,members:[],sessions:[],attendance:{}});
-let state;let activeSession=null;
+let state;let activeSession=null;const roundSelection={};
 const uid=()=>typeof crypto!=='undefined'&&crypto.randomUUID?crypto.randomUUID():'m'+Date.now().toString(36)+Math.random().toString(36).slice(2);
 const nowDate=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
 function safeData(x){if(!x||typeof x!=='object'||!Array.isArray(x.members)||!Array.isArray(x.sessions)||!x.attendance||typeof x.attendance!=='object'||Array.isArray(x.attendance))throw Error('문파원/회차/출석 자료 형식이 올바르지 않아.');
@@ -44,7 +44,47 @@ function renderContentStats(){
    const cells=[m.name+(m.active?'':' (탈퇴)'),counts.present,counts.absent,counts.exempt,counts.missing,denom?Math.round(counts.present/denom*100)+'%':'—'];
    const tr=document.createElement('tr');for(const value of cells){const td=document.createElement('td');td.textContent=String(value);tr.append(td)}body.append(tr);
   }
-  table.append(body);wrap.append(table);section.append(wrap);container.append(section);
+  table.append(body);wrap.append(table);section.append(wrap);
+  // 회차별 상세보기: 콘텐츠별로 독립된 이전/다음 선택을 유지한다.
+  const details=document.createElement('div');details.className='round-details';
+  const ordered=sessions.slice().sort((a,b)=>a.date.localeCompare(b.date)||state.sessions.indexOf(a)-state.sessions.indexOf(b));
+  if(!ordered.length){const note=document.createElement('p');note.className='muted';note.textContent='아직 등록된 회차가 없어.';details.append(note)}
+  else{
+   const wanted=roundSelection[content];let index=ordered.findIndex(v=>v.id===wanted);
+   if(index<0)index=ordered.length-1;
+   const selected=ordered[index];roundSelection[content]=selected.id;
+   const nav=document.createElement('div');nav.className='round-nav';
+   const prev=document.createElement('button');prev.type='button';prev.className='btn secondary round-btn';prev.textContent='‹ 이전';prev.disabled=index===0;
+   prev.setAttribute('aria-label',content+' 이전 회차');prev.onclick=()=>{roundSelection[content]=ordered[index-1].id;renderContentStats()};
+   const label=document.createElement('div');label.className='round-current';
+   const title=document.createElement('strong');title.textContent=`${index+1}회차 / 총 ${ordered.length}회차`;
+   const date=document.createElement('small');date.textContent=selected.date+(selected.label?' · '+selected.label:'');
+   label.append(title,date);
+   const next=document.createElement('button');next.type='button';next.className='btn secondary round-btn';next.textContent='다음 ›';next.disabled=index===ordered.length-1;
+   next.setAttribute('aria-label',content+' 다음 회차');next.onclick=()=>{roundSelection[content]=ordered[index+1].id;renderContentStats()};
+   nav.append(prev,label,next);details.append(nav);
+   const detailWrap=document.createElement('div');detailWrap.className='tablewrap';
+   const detailTable=document.createElement('table');detailTable.className='round-table';
+   const thead=document.createElement('thead');const headings=document.createElement('tr');
+   for(const text of ['문파원','해당 회차 출석']){const th=document.createElement('th');th.textContent=text;headings.append(th)}
+   thead.append(headings);detailTable.append(thead);
+   const tbody=document.createElement('tbody');const counters={present:0,absent:0,exempt:0,missing:0};
+   if(!visible.length){const tr=document.createElement('tr');const td=document.createElement('td');td.colSpan=2;td.textContent='문파원을 추가해 줘.';tr.append(td);tbody.append(tr)}
+   for(const m of visible){
+    const status=state.attendance[selected.id]?.[m.id]||'';
+    const key=['present','absent','exempt'].includes(status)?status:'missing';counters[key]++;
+    const tr=document.createElement('tr');const name=document.createElement('td');name.textContent=m.name+(m.active?'':' (탈퇴)');
+    const cell=document.createElement('td');const badge=document.createElement('span');
+    badge.className='attendance-state state-'+key;
+    badge.textContent=({present:'참석',absent:'불참',exempt:'제외',missing:'미입력'})[key];
+    cell.append(badge);tr.append(name,cell);tbody.append(tr);
+   }
+   detailTable.append(tbody);detailWrap.append(detailTable);details.append(detailWrap);
+   const totals=document.createElement('p');totals.className='round-totals';
+   totals.textContent=`참석 ${counters.present}명 · 불참 ${counters.absent}명 · 제외 ${counters.exempt}명 · 미입력 ${counters.missing}명`;
+   details.append(totals);
+  }
+  section.append(details);container.append(section);
  }
 }
 function addMembers(raw){const names=raw.split(/\r?\n/).map(n=>n.trim()).filter(Boolean);if(!names.length){alert('닉네임을 입력해 줘.');return}let skipped=[];let added=0;for(const name of names){if(name.length>35||state.members.some(m=>m.name.toLowerCase()===name.toLowerCase())){skipped.push(name);continue}state.members.push({id:uid(),name,active:true});added++}update();if(skipped.length)alert(`${added}명 추가됨. 중복/긴 닉네임 ${skipped.length}명은 건너뜀: ${skipped.slice(0,8).join(', ')}`)}
