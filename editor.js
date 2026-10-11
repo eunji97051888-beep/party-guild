@@ -17,16 +17,35 @@
  }
  $('addNotice').onclick=()=>noticeRow({date:new Date().toLocaleDateString('en-CA')});
 
+
+ function compactRow(kind, item={title:'',url:''}){
+  const isVideo=kind==='video';const node=document.createElement('div');node.className='notice-edit-card';
+  node.innerHTML='<div class="notice-edit-head"><strong>'+(isVideo?'유튜브 영상':'자료실 링크')+'</strong><button type="button" class="action danger item-delete">삭제</button></div>'+
+   '<div class="field"><label>표시 제목</label><input class="item-title" maxlength="120" style="width:100%" placeholder="'+(isVideo?'공략 영상 제목':'자료 이름')+'"></div>'+
+   '<div class="field"><label>'+ (isVideo?'유튜브 주소':'링크 주소') +'</label><input class="item-url" type="url" style="width:100%" placeholder="https://..."></div>';
+  node.querySelector('.item-title').value=item.title||'';node.querySelector('.item-url').value=item.url||(isVideo&&item.id?'https://www.youtube.com/watch?v='+item.id:'');
+  node.querySelector('.item-delete').onclick=()=>{if(confirm('이 항목을 삭제할까?'))node.remove()};
+  $(isVideo?'videoRows':'linkRows').append(node);
+ }
+ $('addLink').onclick=()=>compactRow('link');$('addVideo').onclick=()=>compactRow('video');
+ function validHttpUrl(v){try{const u=new URL(v);return (u.protocol==='https:'||u.protocol==='http:')&&Boolean(u.hostname)}catch{return false}}
+ function youtubeId(v){try{const u=new URL(v);const h=u.hostname.toLowerCase().replace(/^www\./,'').replace(/^m\./,'');let id='';if(h==='youtu.be')id=u.pathname.split('/')[1]||'';else if(['youtube.com','youtube-nocookie.com','music.youtube.com'].includes(h)){if(u.pathname==='/watch')id=u.searchParams.get('v')||'';else if(/^\/(shorts|embed|live)\//.test(u.pathname))id=u.pathname.split('/')[2]||'';}return /^[\w-]{11}$/.test(id)?id:null}catch{return null}}
+ function gatherItems(id){return [...$(id).children].map(node=>({title:node.querySelector('.item-title').value.trim(),url:node.querySelector('.item-url').value.trim()}))}
+
  function populate(){document.querySelector('#rows').replaceChildren();$('note').value=original.note;
  $('quoteTitleInput').value=original.quoteTitle??'함께 즐기고 웃는 우리 문파';
- $('quoteSubtitleInput').value=original.quoteSubtitle??'✦ 즐거운 게임, 배려하는 소통 ✦';original.events.forEach(row);$('noticeRows').replaceChildren();(original.notices||[]).forEach(noticeRow)}populate();$('add').onclick=()=>row();$('reset').onclick=()=>{if(confirm('현재 파일에 저장된 기본 일정으로 되돌릴까?')){populate();$('status').textContent='기본 일정으로 되돌렸어.'}};
+ $('quoteSubtitleInput').value=original.quoteSubtitle??'✦ 즐거운 게임, 배려하는 소통 ✦';original.events.forEach(row);$('noticeRows').replaceChildren();(original.notices||[]).forEach(noticeRow);$('linkRows').replaceChildren();(original.resources||[]).forEach(x=>compactRow('link',x));$('videoRows').replaceChildren();(original.videos||window.PARTY_VIDEOS||[]).forEach(x=>compactRow('video',x))}populate();$('add').onclick=()=>row();$('reset').onclick=()=>{if(confirm('현재 파일에 저장된 기본 일정으로 되돌릴까?')){populate();$('status').textContent='기본 일정으로 되돌렸어.'}};
  const download=(name,blob)=>{const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000)};
  $('exportData').onclick=()=>{const events=[...$('rows').children].map(el=>({days:[...el.querySelectorAll('input[type=checkbox]:checked')].map(x=>Number(x.value)),time:el.querySelector('.time').value,name:el.querySelector('.name').value.trim(),type:el.querySelector('.kind').value.trim()}));if(events.some(x=>!x.time||!x.name||!x.type||!x.days.length)){alert('각 일정에 시간, 이름, 종류, 요일을 모두 입력해 줘.');return}const quoteTitle=$('quoteTitleInput').value.trim();
  const quoteSubtitle=$('quoteSubtitleInput').value.trim();
  if(!quoteTitle){alert('문파 안내 상자 큰 글씨를 입력해 줘.');return}
  const notices=[...$('noticeRows').children].map(el=>({title:el.querySelector('.notice-title').value.trim(),body:el.querySelector('.notice-body').value.trim(),date:el.querySelector('.notice-date').value,pinned:el.querySelector('.notice-pinned').checked}));
  if(notices.some(n=>!n.title||!n.body)){alert('모든 공지사항에 제목과 내용을 입력해 줘. 빈 공지는 삭제하면 돼.');return}
- const data={quoteTitle,quoteSubtitle,note:$('note').value.trim(),image:'weekly.png',notices,events};const js='window.PARTY_DEFAULT = '+JSON.stringify(data,null,2)+';\n';download('data.js',new Blob([js],{type:'text/javascript;charset=utf-8'}));$('status').textContent='data.js 다운로드 완료! 이제 GitHub에 이 파일을 올리면 돼.'};
+ const resources=gatherItems('link');const enteredVideos=gatherItems('video');
+ if(resources.some(x=>!x.title||!validHttpUrl(x.url))){alert('자료실 링크의 제목과 주소(http/https)를 확인해 줘.');return}
+ if(enteredVideos.some(x=>!x.title||!youtubeId(x.url))){alert('유튜브 제목과 주소를 확인해 줘. 동영상 링크만 등록할 수 있어.');return}
+ const videos=enteredVideos.map(x=>({title:x.title,id:youtubeId(x.url)}));
+ const data={...original,quoteTitle,quoteSubtitle,note:$('note').value.trim(),image:original.image||'weekly.png',notices,events,resources,videos};const js='window.PARTY_DEFAULT = '+JSON.stringify(data,null,2)+';\n';download('data.js',new Blob([js],{type:'text/javascript;charset=utf-8'}));$('status').textContent='data.js 다운로드 완료! 이제 GitHub에 이 파일을 올리면 돼.'};
  $('imageFile').onchange=()=>{let f=$('imageFile').files?.[0];if(currentPreview)URL.revokeObjectURL(currentPreview);if(!f){$('exportImage').disabled=true;return}if(!['image/png','image/jpeg','image/webp'].includes(f.type)||f.size>15*1024*1024){alert('15MB 이하 PNG/JPG/WEBP 이미지로 선택해 줘.');$('imageFile').value='';return}currentPreview=URL.createObjectURL(f);$('preview').src=currentPreview;$('exportImage').disabled=false};
  $('exportImage').onclick=async()=>{try{const f=$('imageFile').files?.[0];if(!f)return;const bitmap=await createImageBitmap(f);const canvas=document.createElement('canvas');canvas.width=bitmap.width;canvas.height=bitmap.height;const ctx=canvas.getContext('2d');ctx.drawImage(bitmap,0,0);bitmap.close();canvas.toBlob(blob=>{if(!blob){alert('이미지 변환에 실패했어.');return}download('weekly.png',blob);$('status').textContent='weekly.png 다운로드 완료! GitHub에 업로드해 줘.'},'image/png')}catch(e){alert('이미지 처리 실패: '+e.message)}};
 })();

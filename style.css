@@ -104,3 +104,6 @@
 .notice-pin{font-size:11px;font-weight:800;background:#f0c889;color:#1a2640;padding:4px 8px;border-radius:5px}
 .notice-empty{margin:0;padding:25px;text-align:center;color:#b4c1dc;background:#23304b;border-radius:10px}
 @media(max-width:720px){.guild-announcements{margin-top:12px}.notice-entry{padding:15px}.notice-entry time{margin-left:0;width:100%}}
+
+/* V10: resources links, preserving existing background and banner */
+.resource-links{display:grid;gap:9px;margin-top:15px}.resource-link{display:block;border:1px solid #445574;background:#253451;padding:13px 15px;border-radius:8px;font-size:13px;overflow-wrap:anywhere}.resource-link:hover{border-color:#eac48b;color:#f5d59e}
