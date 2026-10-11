@@ -1,4 +1,6 @@
 window.PARTY_DEFAULT = {
+  quoteTitle: '함께 즐기고 웃는 우리 문파',
+  quoteSubtitle: '✦ 즐거운 게임, 배려하는 소통 ✦',
   note: '오픈채팅방 참여는 필수이며, 문파 콘텐츠도 함께 즐겨주세요. 상세 운영 공지는 오픈채팅방에서 확인할 수 있습니다.',
   image: 'weekly.png',
   events: [
