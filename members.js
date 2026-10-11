@@ -31,20 +31,6 @@ function renderContentStats(){
   const h=document.createElement('h3');h.textContent=content;
   const sub=document.createElement('span');sub.className='pill';sub.textContent=sessions.length+'회차';
   header.append(h,sub);section.append(header);
-  const wrap=document.createElement('div');wrap.className='tablewrap';
-  const table=document.createElement('table');
-  const head=document.createElement('thead');const hr=document.createElement('tr');
-  for(const col of ['문파원','참석','불참','제외','미입력','출석률']){const th=document.createElement('th');th.textContent=col;hr.append(th)}head.append(hr);table.append(head);
-  const body=document.createElement('tbody');
-  if(!visible.length){const tr=document.createElement('tr');const td=document.createElement('td');td.colSpan=6;td.textContent='문파원을 추가해 줘.';tr.append(td);body.append(tr)}
-  for(const m of visible){
-   const counts={present:0,absent:0,exempt:0,missing:0};
-   for(const s of sessions){const v=state.attendance[s.id]?.[m.id];if(v==='present')counts.present++;else if(v==='absent')counts.absent++;else if(v==='exempt')counts.exempt++;else counts.missing++}
-   const denom=counts.present+counts.absent;
-   const cells=[m.name+(m.active?'':' (탈퇴)'),counts.present,counts.absent,counts.exempt,counts.missing,denom?Math.round(counts.present/denom*100)+'%':'—'];
-   const tr=document.createElement('tr');for(const value of cells){const td=document.createElement('td');td.textContent=String(value);tr.append(td)}body.append(tr);
-  }
-  table.append(body);wrap.append(table);section.append(wrap);
   // 회차별 상세보기: 콘텐츠별로 독립된 이전/다음 선택을 유지한다.
   const details=document.createElement('div');details.className='round-details';
   const ordered=sessions.slice().sort((a,b)=>a.date.localeCompare(b.date)||state.sessions.indexOf(a)-state.sessions.indexOf(b));
