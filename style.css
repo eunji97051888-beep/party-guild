@@ -3,3 +3,47 @@
 .page-wrap{position:relative;max-width:1780px;width:calc(100% - 72px);margin:0 auto;padding:35px 0 10px}.section-heading{display:flex;align-items:end;justify-content:space-between;margin:0 0 19px}.kicker{font-size:10px;letter-spacing:.23em;color:var(--gold);font-weight:800}.section-heading h2{font:700 28px 'Noto Serif KR';margin:8px 0 5px}.section-heading p{font-size:12px;color:var(--sub);margin:0}.text-link{font-size:12px;color:#e2bb81}.dash-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:18px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 36px #050b1f3b;padding:24px;min-width:0}.panel-title{display:flex;align-items:center;gap:12px}.panel-icon{font:700 19px 'Noto Serif KR';background:#2a3559;border:1px solid #69708c67;color:#e2c28b;border-radius:9px;min-width:42px;height:42px;display:grid;place-items:center}.panel-title small{font-size:9px;color:#adacd3;letter-spacing:.19em;font-weight:800}.panel-title h3{font:700 20px 'Noto Serif KR';margin:3px 0 0}.chip{margin-left:auto;border:1px solid #d6be9554;padding:6px 10px;font-size:10px;color:#dfc598;border-radius:30px}.weekday{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin:23px 0}.day{cursor:pointer;color:#dfe6fa;background:#242f4b;border:1px solid #394663;border-radius:7px;min-height:41px;font-weight:700}.day.active{background:#e4c18d;border-color:#e4c18d;color:#14203d}.day:hover{border-color:var(--gold)}.list-meta{display:flex;justify-content:space-between;margin-bottom:12px;font-size:12px}.list-meta span,.fineprint{color:#9eaac7;font-size:11px}.events{display:grid;gap:9px}.event{display:flex;align-items:center;gap:16px;background:#23314f;border:1px solid #394763;border-radius:9px;padding:14px 17px}.event-mark{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:#364463;color:#e8ca9d}.event-time{color:var(--gold);font-size:18px;font-weight:800;min-width:60px}.event-content b{display:block;font-size:14px}.event-content small{display:block;color:#aab7ce;font-size:11px;margin-top:2px}.empty{color:#c6d0e0;padding:36px 10px;text-align:center}.fineprint{margin:17px 0 0}.quote{margin:22px 0;padding:27px 16px;text-align:center;background:linear-gradient(115deg,#34315e,#42416b);border:1px solid #8882a65a;border-radius:9px}.quote strong{display:block;font:700 21px 'Noto Serif KR'}.quote span{display:block;font-size:11px;color:#dfc59c;margin-top:8px}.notice>p{font-size:12px;line-height:1.85;color:#c8d0df}.rules{margin-top:18px;border-top:1px solid #ffffff17}.rules div{padding:13px 0;border-bottom:1px solid #ffffff17;display:grid;grid-template-columns:26px 1fr;gap:4px 8px}.rules div span{color:#dfbc84;grid-row:span 2;font-size:11px}.rules b{font-size:12px}.rules small{color:#aeb9cf;font-size:11px}.planner{margin-top:18px}.panel-sub{color:var(--sub);font-size:12px;margin:14px 0 15px}.image-button{display:block;width:100%;padding:7px;cursor:zoom-in;border-radius:11px;background:#0c1324;border:1px solid #465170}.image-button img{display:block;width:100%;height:auto;border-radius:5px}.lower-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:18px;margin-top:18px}.quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:24px}.quick-grid a{display:flex;align-items:center;gap:12px;min-height:67px;border:1px solid #34415d;border-radius:9px;background:#24314b;padding:12px 14px;font-size:13px}.quick-grid a span{font-size:21px}.quick-grid a:hover{border-color:var(--gold)}.video-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:24px}.video-card{display:block;background:#222e48;border:1px solid #3a4763;border-radius:9px;overflow:hidden}.video-card img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}.video-card strong{display:block;padding:10px 10px 12px;font-size:12px;line-height:1.4}.video-empty{grid-column:1/-1;background:#23314a;border:1px dashed #586782;color:#b5c2d9;padding:34px 16px;text-align:center;border-radius:9px;font-size:12px}.video-card:hover{border-color:#edc58a}footer{display:flex;justify-content:space-between;gap:20px;border-top:1px solid #ffffff1e;margin-top:32px;padding:25px 0 32px;color:#95a4c0;font-size:11px}footer b{color:#e4c28d}footer p{margin:5px 0 0}.lightbox[hidden]{display:none}.lightbox{position:fixed;z-index:100;inset:0;background:#040711ed;display:flex;align-items:center;justify-content:center;padding:50px 14px 14px}.lightbox img{max-width:98vw;max-height:92vh;object-fit:contain}.lightbox button{position:absolute;right:20px;top:14px;border:0;background:#e7be7d;color:#19203a;border-radius:100%;width:35px;height:35px;cursor:pointer}
 @media(max-width:1000px){.top-inner,.hero-content,.page-wrap{width:calc(100% - 40px)}.topbar nav{gap:12px}.topbar nav a{font-size:11px}.top-cta{display:none}.hero-stage{min-height:340px;background:linear-gradient(90deg,rgba(9,15,35,.88) 0 36%,rgba(9,15,35,.52) 48%,rgba(9,15,35,.10) 65%),url('party-banner.png') center center/cover no-repeat}.hero-stage-copy{max-width:430px;padding:38px 34px 34px}.dash-grid{grid-template-columns:1fr 1fr}.panel{padding:18px}}
 @media(max-width:720px){.top-inner{min-height:64px;width:calc(100% - 28px)}.brand strong{font-size:17px}.topbar nav{gap:13px}.topbar nav a{font-size:10px}.topbar nav a:nth-child(n+3){display:none}.hero{min-height:auto;background:#13213e}.hero::before{background:linear-gradient(#243859cc,#0e1428)}.hero-content{width:calc(100% - 28px);padding:24px 0 22px}.hero-eyebrow{margin-bottom:8px;font-size:9px}.hero-stage{min-height:250px;border-radius:12px;background:linear-gradient(0deg,rgba(9,15,35,.46),rgba(9,15,35,.46)),url('party-banner.png') center center/cover no-repeat}.hero-stage-copy{max-width:none;padding:20px 18px 18px}.hero h1{font-size:34px;margin-bottom:9px}.hero-stage-copy p{font-size:12px}.hero-actions{margin-top:17px}.today-date{margin-top:15px}.page-wrap{width:calc(100% - 24px);padding-top:20px}.section-heading h2{font-size:23px}.section-heading p{font-size:11px}.text-link{font-size:10px}.dash-grid,.lower-grid{grid-template-columns:1fr;gap:12px}.panel{padding:15px;border-radius:11px}.panel-title h3{font-size:17px}.weekday{gap:4px;margin:17px 0}.day{min-height:38px;font-size:12px}.event{padding:13px 10px;gap:10px}.event-time{font-size:16px;min-width:49px}.quote{padding:22px 14px}.quote strong{font-size:17px}.planner{margin-top:12px}.video-list{grid-template-columns:repeat(2,minmax(0,1fr))}.video-empty{grid-column:1/-1}footer{display:block;line-height:1.8}}
+/* PARTY - PC banner and side background */
+@media (min-width: 1024px) {
+  body {
+    background: linear-gradient(rgba(14,20,40,.30), rgba(14,20,40,.58)), url('desktop-bg.png') center center / cover fixed no-repeat !important;
+  }
+  .hero {
+    min-height: 0 !important;
+    background: transparent !important;
+  }
+  .hero::before {
+    background: none !important;
+  }
+  .hero-content {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0 !important;
+  }
+  .hero-eyebrow {
+    display: none !important;
+  }
+  .hero-stage {
+    width: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: none !important;
+    overflow: hidden;
+  }
+  .hero-stage::before {
+    content: '';
+    display: block;
+    width: 100%;
+    aspect-ratio: 1672 / 941;
+    background: url('party-banner.png') center center / 100% 100% no-repeat;
+  }
+  .hero-stage-copy, .banner-corner {
+    display: none !important;
+  }
+  .page-wrap {
+    background: transparent;
+  }
+}
