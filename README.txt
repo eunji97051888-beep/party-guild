@@ -1,22 +1,15 @@
-파티 문파 v2 | 무료 동양 판타지 일정 웹사이트
+PARTY GUILD V3 — 무료 GitHub Pages 문파 일정 홈페이지
 
-1. 처음 게시할 때
-- ZIP 압축을 풉니다.
-- GitHub party-guild 저장소에 이 폴더의 파일 7개(index.html, admin.html, app.js, editor.js, style.css, data.js, weekly.png)를 업로드합니다.
-- Commit changes 후 1~5분 정도 기다린 다음 페이지를 새로고침합니다.
-- 예전에 업로드한 config.js, firestore.rules, storage.rules는 새 버전에 필요하지 않습니다.
+1. ZIP 압축 풀기
+2. GitHub 저장소 party-guild > Add file > Upload files
+3. ZIP 내부의 파일들(index.html, style.css, app.js, data.js, admin.html, admin-style.css, editor.js, weekly.png, moonlit-world.svg, README.txt)을 업로드
+4. Commit changes 누르기. GitHub Pages 갱신까지 수분 소요 가능
+5. Ctrl+F5로 확인
 
-2. 사이트에서 수정하기
-- https://[내-GitHub-아이디].github.io/party-guild/admin.html 로 접속합니다.
-- 관리자 페이지는 로그인 기능이 없고 공개되어 있습니다. 단, 여기서 수정했다고 사이트가 바뀌지는 않습니다.
-- 안내 또는 일정 수정 후 '수정한 일정 파일 다운로드'로 data.js를 저장합니다.
-- 게임 사진을 바꾸면 '새 스크린샷 다운로드'로 weekly.png를 저장합니다.
-- GitHub party-guild > Add file > Upload files에 파일을 넣고 Commit changes 합니다.
-- GitHub 저장소 수정 권한이 있는 계정만 실제 게시 내용을 바꿀 수 있습니다.
+관리자 편집 방법: admin.html에 접속해 시간/공지/스크린샷을 편집해 파일(data.js, weekly.png)을 다운로드한 후 GitHub에 재업로드.
+관리자 화면은 로그인 기능이 없고 공개적으로 접근 가능하지만 GitHub 업로드 권한 없이는 남의 사이트를 수정할 수 없습니다. 비밀번호를 입력하지 마세요.
+별도 Firebase 서비스나 결제 계정 필요 없음.
 
-3. 주요 주의사항
-- Firebase 및 결제 계정이 필요 없습니다.
-- 카카오 기본 오픈채팅봇은 날짜 계산이나 이미지 즉시 전송을 할 수 없습니다. /일정 질문에 사이트 링크를 등록하는 방식이 적합합니다.
-- 주간 플래너 원본 캡처는 특정 날짜를 포함하므로 실제 주차에 따라 오래된 화면일 수 있습니다. 정기 반복 일정은 텍스트로 표시됩니다.
-- GitHub Pages는 공개 웹사이트입니다. 비밀번호나 개인 정보를 올리지 마세요.
-- 디자인 배경은 CSS/SVG로 구성했으며 외부 웹폰트는 네트워크가 가능할 때 사용됩니다.
+참고: 기존 Firebase용 파일(config.js, firestore.rules, storage.rules)은 이번 새 사이트의 기능에 필요하지 않지만 바로 삭제하지 않아도 됩니다.
+
+디자인: 도깨비의세계의 K-판타지 분위기를 참고하여 별도로 제작한 일러스트풍 벡터 배경. 비공식 문파 팬페이지이며 실제 게임사의 공식 사이트가 아닙니다.
