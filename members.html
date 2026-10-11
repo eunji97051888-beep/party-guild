@@ -13,4 +13,5 @@
 <section class="panel"><div class="panelhead"><div><span class="eyebrow">ATTENDANCE CHECK</span><h2>출석 체크</h2></div><span id="currentSessionLabel" class="pill">회차를 선택해 줘</span></div>
 <p class="help">상태: <b>참석</b> / <b>불참</b> / <b>제외</b> / <b>미입력</b>. 제외는 출석률 계산에서 분모에 포함하지 않아.</p><div id="attendanceArea"></div></section>
 <section class="panel"><div class="panelhead"><div><span class="eyebrow">SUMMARY</span><h2>문파원별 출석 통계</h2></div></div><div class="tablewrap"><table><thead><tr><th>문파원</th><th>참석</th><th>불참</th><th>제외</th><th>미입력</th><th>출석률</th></tr></thead><tbody id="statsBody"></tbody></table></div><p class="help">출석률 = 참석 ÷ (참석 + 불참) × 100. 아직 기록하지 않은 회차는 계산에서 제외돼. V12 보상 분배 기능은 여기서 보존한 고유 문파원 ID를 활용할 예정이야.</p></section>
-</main><script src="members.js?v=11"></script></body></html>
+<section class="panel" id="contentStatistics"><div class="panelhead"><div><span class="eyebrow">CONTENT-BY-CONTENT SUMMARY</span><h2>콘텐츠별 출석 통계</h2></div></div><p class="help">요신토벌령 · 결계지방어 · 미혹의 정원 · 신기 쟁탈전 통계를 각각 확인해. 위의 전체 통계와 계산 기준은 같아.</p><div id="contentStats" class="content-stats-grid"></div></section>
+</main><script src="members.js?v=11-stats1"></script></body></html>
