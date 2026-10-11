@@ -1,0 +1,11 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /public/schedule {
+      allow read: if true;
+      allow write: if request.auth != null
+        && request.auth.token.email == 'REPLACE_WITH_ADMIN_EMAIL'
+;
+    }
+  }
+}
