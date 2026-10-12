@@ -8,4 +8,14 @@
   window.addEventListener('error',e=>{if(!moduleReady){status.textContent='인증 스크립트 로딩 오류: '+(e.message||'네트워크 또는 확장 프로그램 차단');status.style.color='#ffaaaa';}});
   window.addEventListener('unhandledrejection',e=>{if(!moduleReady){status.textContent='인증 초기화 오류: '+String(e.reason?.message||e.reason||'알 수 없는 오류');status.style.color='#ffaaaa';}});
 })();
-</script><script type="module" src="community.js?v=14-mobile-login-2"></script></body></html>
+</script><script type="module">
+const status=document.getElementById('authStatus');
+try {
+  status.textContent='인증 모듈 연결 중…';
+  await import('./community.js?v=15-auth-load-1');
+} catch (err) {
+  status.textContent='인증 모듈 실행 실패: '+(err?.message||String(err))+' (화면을 캡처해 주세요)';
+  status.style.color='#ffaaaa';
+  console.error('party community auth load failed',err);
+}
+</script></body></html>
