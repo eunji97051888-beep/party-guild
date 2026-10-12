@@ -2,7 +2,7 @@
 const status=document.getElementById('adminStatus');
 try {
   status.textContent='관리자 인증 모듈 연결 중…';
-  await import('./community-admin-v17.js?v=17');
+  await import('./community-admin-v18.js?v=18-20261012');
 } catch(err) {
   status.textContent='관리자 인증 모듈 실행 실패: '+(err?.message||String(err))+' (화면을 캡처해 주세요)';
   status.style.color='#ffaaaa';
