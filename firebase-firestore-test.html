@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>파티 문파 · Firestore 저장 테스트</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:24px;font-family:system-ui,'Malgun Gothic',sans-serif;color:#f3efe8;background:radial-gradient(ellipse at top,#354467,#131b30 75%);display:grid;place-items:center}.panel{width:min(650px,100%);padding:30px;border:1px solid #71809c;border-radius:16px;background:#202b44}h1{font-size:27px;margin:8px 0}p{color:#c3cce0;line-height:1.7}.kicker{color:#e9bf80;letter-spacing:2px;font-size:12px;font-weight:800}label{display:block;margin:15px 0 7px;color:#e9bf80;font-weight:700}input,textarea{font:inherit;width:100%;background:#142239;border:1px solid #64748e;color:white;padding:12px;border-radius:8px}textarea{min-height:100px;resize:vertical}button{border:0;border-radius:8px;background:#e9bf80;color:#152136;padding:11px 16px;cursor:pointer;font-weight:800}button.secondary{background:#41516d;color:white}button:disabled{opacity:.55;cursor:not-allowed}.actions{display:flex;flex-wrap:wrap;gap:10px;margin:17px 0}.status,.result{white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;background:#121f36;border-radius:8px;margin-top:12px;color:#dce6fb}.result{border:1px solid #687a97}small{color:#b5c1d6}a{color:#f0c688}.field{margin-top:8px}</style></head>
+<body><main class="panel"><div class="kicker">PARTY · FIRESTORE TEST</div><h1>공지 저장·읽기 테스트</h1><p>기존 V13 홈페이지는 수정하지 않아. Firestore의 <code>publicContent/testNotice</code> 문서 1개만 테스트해.</p>
+<div class="actions"><button id="login" disabled>Google로 로그인</button><button id="logout" class="secondary" hidden>로그아웃</button><button id="read" class="secondary" disabled>저장된 공지 읽기</button></div>
+<div id="auth" class="status">Firebase 연결 준비 중...</div>
+<div class="field"><label for="title">테스트 공지 제목</label><input id="title" value="파티 문파 Firebase 테스트" maxlength="100"></div>
+<div class="field"><label for="body">테스트 내용</label><textarea id="body" maxlength="1000">Firebase 연결 및 자동 저장 테스트입니다.</textarea></div>
+<div class="actions"><button id="save" disabled>Firestore에 테스트 공지 저장</button></div>
+<div id="status" role="status" class="status">대기 중</div><div id="result" class="result">아직 읽어온 공지가 없어.</div>
+<p><small>규칙이 올바르다면 누구나 테스트 공지를 읽을 수 있지만, 지정한 관리자 UID로 로그인한 사용자만 저장할 수 있어. 실제 문파원 출석·재화 기록은 여기에 넣지 마.</small></p><p><a href="index.html">← 파티 문파 홈페이지</a></p></main>
+<script type="module">
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js';
+import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut} from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
+import {getFirestore,doc,getDoc,setDoc,serverTimestamp} from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js';
+const firebaseConfig={apiKey:'AIzaSyD_JzuNnKKuc-NU26KatxO2jqZCUVAebPE',authDomain:'party-guild.firebaseapp.com',projectId:'party-guild',storageBucket:'party-guild.firebasestorage.app',messagingSenderId:'465332308360',appId:'1:465332308360:web:50b5663dc1563df3d6923d'};
+const $=id=>document.getElementById(id), stat=(message)=>$('status').textContent=message;
+try {
+ const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),notice=doc(db,'publicContent','testNotice');
+ const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});
+ const adminUid='KkmihHrjJ3X82JLrdzymrkEUZyE3';
+ onAuthStateChanged(auth,user=>{
+  $('login').disabled=false;$('login').hidden=!!user;$('logout').hidden=!user;$('read').disabled=false;
+  const admin=!!user&&user.uid===adminUid;$('save').disabled=!admin;
+  $('auth').textContent=user?(admin?'✅ 관리자 계정 로그인됨: ':'로그인됨(관리자 UID 불일치): ')+(user.email||user.displayName||'Google 계정'):'로그아웃 상태 · 공개 공지 읽기 테스트 가능';
+  if(!admin&&user)stat('로그인한 계정은 등록된 관리자 UID와 달라 저장이 차단돼.');
+ },err=>stat('인증 상태 오류: '+err.message));
+ $('login').onclick=async()=>{try{await signInWithPopup(auth,provider)}catch(e){stat('로그인 오류: '+e.code+' / '+e.message)}};
+ $('logout').onclick=async()=>{try{await signOut(auth)}catch(e){stat('로그아웃 오류: '+e.message)}};
+ $('read').onclick=async()=>{try{stat('Firestore에서 불러오는 중...');const snap=await getDoc(notice);if(!snap.exists()){ $('result').textContent='아직 저장된 테스트 공지가 없어.';stat('조회 성공 · 문서 없음');return;}const d=snap.data();$('result').textContent='제목: '+(d.title||'')+'\n내용: '+(d.body||'')+'\n저장 시간: '+(d.updatedAt?.toDate?.().toLocaleString('ko-KR')||'확인 중');stat('✅ Firestore에서 공지를 읽었어.');}catch(e){stat('❌ 읽기 오류: '+e.code+' / '+e.message)}};
+ $('save').onclick=async()=>{const title=$('title').value.trim(),body=$('body').value.trim();if(!title||!body){stat('제목과 내용을 입력해 줘.');return;}if(auth.currentUser?.uid!==adminUid){stat('관리자 계정 로그인이 필요해.');return;}$('save').disabled=true;try{stat('저장 중...');await setDoc(notice,{title,body,updatedAt:serverTimestamp()});stat('✅ Firestore 저장 성공! 이제 새로고침하거나 로그아웃해서 읽기 버튼을 눌러봐.');$('read').click();}catch(e){stat('❌ 저장 오류: '+e.code+' / '+e.message);}finally{$('save').disabled=auth.currentUser?.uid!==adminUid;}};
+}catch(e){stat('Firebase 초기화 오류: '+e.message)}
+</script></body></html>
