@@ -1,0 +1,6 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PARTY · 출석·보상 변경 이력</title><link rel="stylesheet" href="history.css?v=11"></head><body>
+<header><a href="admin.html">← 문주 관리자</a><a href="members.html">출석 관리</a><a href="rewards.html">보상 관리</a></header>
+<main><div class="kicker">PARTY GUILD · HISTORY</div><h1>🕒 출석·보상 변경 이력</h1><p class="notice">이 이력은 <b>현재 브라우저</b>에만 저장돼. Firebase 클라우드 백업 기록이나 운영진의 다른 컴퓨터 변경 이력은 여기서 볼 수 없어. 기록은 각 장부별 최대 25개까지 저장돼.</p>
+<section class="panel"><h2>보관된 기록 확인</h2><div class="toolbar"><label for="kind">장부 선택</label><select id="kind"><option value="attendance">문파원·출석</option><option value="rewards">재화·보상</option></select><button id="reload">새로고침</button><button id="export">현재 기록 JSON 백업</button></div><p id="status" role="status"></p><div id="entries" class="entries"></div></section>
+<section class="panel"><h2>복원 전 꼭 확인해 줘</h2><p>이전 상태로 복원하면 <b>선택한 장부의 현재 전체 기록</b>이 교체돼. 실제 게임의 재료 지급을 취소하거나 Firebase 데이터를 자동으로 바꾸지는 않아.</p><p>복원 직전 현재 기록도 이력에 백업한 다음 교체하도록 만들었지만, 브라우저 데이터 삭제에 대비해서 위의 <b>현재 기록 JSON 백업</b>도 별도로 받아두는 게 좋아.</p></section></main>
+<script src="history-core.js?v=11"></script><script src="history.js?v=11"></script></body></html>
