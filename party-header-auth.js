@@ -8,6 +8,14 @@ const account=document.getElementById('partyHeaderAccount');
 const admin=document.getElementById('partyAdminShortcut');
 const host=document.getElementById('partyHeaderAuth');
 if(login&&logout&&account&&admin&&host){
+ const placeAdmin=()=>{
+   // Mobile nav may be clipped by the old site's horizontal navigation.
+   if(window.matchMedia('(max-width: 850px)').matches){
+     if(admin.parentNode!==document.body) document.body.appendChild(admin);
+   }else if(admin.parentNode!==host){host.appendChild(admin);}
+ };
+ placeAdmin();
+ window.addEventListener('resize',placeAdmin,{passive:true});
  const status=document.createElement('span');status.className='party-header-auth-note';status.setAttribute('role','status');host.appendChild(status);
  const say=message=>{status.textContent=message||'';};
  const sync=user=>{

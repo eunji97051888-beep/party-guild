@@ -23,3 +23,18 @@
  .party-header-auth .party-auth-admin{font-size:12px;padding:9px 12px}
  .party-header-auth .party-auth-account{max-width:100px}
 }
+
+/* V19 mobile admin dock: independent from overflowing navbar */
+.party-auth-admin[hidden], #partyAdminShortcut[hidden]{display:none!important}
+@media (max-width:850px){
+  body > #partyAdminShortcut.party-auth-admin{
+    position:fixed!important;right:14px;bottom:86px;left:auto;top:auto;
+    z-index:99999;display:inline-flex!important;align-items:center;justify-content:center;
+    box-sizing:border-box;max-width:calc(100vw - 28px);min-height:46px;
+    padding:12px 17px;border:1px solid #f0ca87;border-radius:16px;
+    background:#172543;color:#ffe2aa;font-size:13px;font-weight:800;
+    text-decoration:none;box-shadow:0 5px 24px rgba(0,0,0,.58);
+    white-space:nowrap
+  }
+  body > #partyAdminShortcut.party-auth-admin[hidden]{display:none!important}
+}
