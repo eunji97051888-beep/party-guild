@@ -1,0 +1,22 @@
+(()=>{'use strict';
+const ATT='party-guild-v11-attendance',REW='party-guild-v12-rewards';
+const $=id=>document.getElementById(id);let attendance=null,rewards=null,results=[];
+const fmt=d=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+function range(days){const d=new Date();$('end').value=fmt(d);d.setDate(d.getDate()-(days-1));$('start').value=fmt(d);render()}
+function load(){let messages=[];try{const x=JSON.parse(localStorage.getItem(ATT));attendance=x&&Array.isArray(x.members)&&Array.isArray(x.sessions)&&x.attendance&&!Array.isArray(x.attendance)&&typeof x.attendance==='object'?x:null}catch{attendance=null;messages.push('출석 자료 JSON 읽기 오류')}
+try{const x=JSON.parse(localStorage.getItem(REW));rewards=x&&Array.isArray(x.requests)?x:null}catch{rewards=null;messages.push('보상 자료 JSON 읽기 오류')}
+$('source').textContent=(messages.length?'⚠️ '+messages.join(' · ')+' / ':'')+`출석: ${attendance?'현재 브라우저 기록 확인':'기록 없음'} · 보상: ${rewards?'현재 브라우저 기록 확인':'기록 없음'} (읽기 전용)`;render()}
+function rate(p,a){return p+a?Math.round(p/(p+a)*100):null}
+function td(tr,v){const el=document.createElement('td');el.textContent=String(v);tr.append(el)}
+function render(){const start=$('start').value,end=$('end').value,content=$('content').value,q=$('search').value.trim().toLocaleLowerCase('ko');const rows=$('rows');rows.replaceChildren();results=[];
+if(!start||!end||start>end){$('source').textContent='⚠️ 올바른 시작일과 종료일을 선택해 줘.';return}
+const members=(attendance?.members||[]).filter(m=>m&&m.active===true&&typeof m.id==='string'&&typeof m.name==='string');const sessions=(attendance?.sessions||[]).filter(s=>s&&typeof s.id==='string'&&s.date>=start&&s.date<=end&&(content==='all'||s.content===content));const paid=(rewards?.requests||[]).filter(r=>r&&r.status==='paid'&&typeof r.paidAt==='string'&&r.paidAt>=start&&r.paidAt<=end);
+let totalPresent=0;results=members.map(m=>{const c={present:0,absent:0,exempt:0,missing:0};for(const s of sessions){const v=attendance.attendance[s.id]?.[m.id];c[v==='present'||v==='absent'||v==='exempt'?v:'missing']++}const pay=paid.filter(r=>r.memberId===m.id).length;totalPresent+=c.present;return {name:m.name,...c,pay,rate:rate(c.present,c.absent),eligible:c.present+c.absent>0}}).sort((a,b)=>Number(b.eligible)-Number(a.eligible)||b.present-a.present||a.pay-b.pay||(b.rate??-1)-(a.rate??-1)||a.name.localeCompare(b.name,'ko'));
+$('members').textContent=attendance?members.length+' / 30':'—';$('sessions').textContent=attendance?sessions.length+'회':'—';$('presents').textContent=attendance?totalPresent+'건':'—';$('paid').textContent=rewards?paid.length+'건':'—';
+let rank=0;let filtered=results.filter(r=>r.name.toLocaleLowerCase('ko').includes(q));for(const r of filtered){const tr=document.createElement('tr');const idx=r.eligible?++rank:'—';td(tr,idx);td(tr,r.name);td(tr,r.present);td(tr,r.absent);td(tr,r.exempt);td(tr,r.missing);td(tr,r.rate===null?'—':r.rate+'%');td(tr,rewards?r.pay:'기록 없음');td(tr,!r.eligible?'평가 기록 부족':!rewards?'보상 기록 확인 필요':r.pay===0?'기간 내 지급 기록 없음':'지급 기록 확인');rows.append(tr)}
+if(!filtered.length){const tr=document.createElement('tr'),cell=document.createElement('td');cell.colSpan=9;cell.textContent='표시할 문파원 또는 기록이 없어.';tr.append(cell);rows.append(tr)}
+if(!attendance)$('source').textContent='ℹ️ 이 브라우저에 출석 기록이 없어. 원본 PC에서 확인해야 추천할 수 있어. (읽기 전용)';
+}
+function csv(){if(!attendance){alert('먼저 출석 기록이 있는 PC에서 열어 줘.');return}const lines=[['문파원','참석','불참','제외','미입력','출석률','지급완료건수','주의'],...results.map(r=>[r.name,r.present,r.absent,r.exempt,r.missing,r.rate===null?'':r.rate+'%',rewards?r.pay:'',r.eligible?'참고용 추천':'평가 기록 부족'])];const esc=x=>'"'+String(x??'').replaceAll('"','""')+'"';const blob=new Blob(['\ufeff'+lines.map(r=>r.map(esc).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`party-reward-priority-${$('start').value}-${$('end').value}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),5000)}
+$('lastWeek').onclick=()=>range(7);$('month').onclick=()=>range(30);$('reload').onclick=load;$('csv').onclick=csv;for(const id of ['start','end','content','search'])$(id).addEventListener(id==='search'?'input':'change',render);range(7);load();
+})();
