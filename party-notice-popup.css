@@ -1,0 +1,20 @@
+/* 공지는 제목만 노출. 기존 Firebase/로컬 렌더러 변경하지 않음 */
+#noticeItems .notice-entry{margin-bottom:8px;padding:0;overflow:hidden}
+#noticeItems .notice-entry > p{display:none!important}
+#noticeItems .notice-entry-heading{display:flex;align-items:center;gap:12px;padding:14px 16px;min-height:58px}
+#noticeItems .notice-entry-heading h4{flex:1;min-width:0;margin:0!important}
+#noticeItems .party-notice-open{display:block;width:100%;padding:4px 2px;color:#fff2dc;background:transparent;border:0;text-align:left;font:inherit;font-weight:700;line-height:1.5;cursor:pointer;overflow-wrap:anywhere}
+#noticeItems .party-notice-open:hover{color:#f5cb83}
+#noticeItems .party-notice-open:focus-visible,.party-modal-close:focus-visible{outline:2px solid #eac481;outline-offset:3px}
+#noticeItems .notice-entry-heading time{white-space:nowrap}
+.party-notice-modal[hidden]{display:none!important}
+.party-notice-modal{position:fixed;inset:0;background:#050914cb;z-index:99999;display:grid;place-items:center;padding:16px}
+.party-notice-dialog{width:min(680px,100%);max-height:min(85vh,850px);display:flex;flex-direction:column;background:linear-gradient(145deg,#222c49,#111b34);border:1px solid #b99762;border-radius:18px;box-shadow:0 22px 100px #0009;color:#f9f4eb;overflow:hidden}
+.party-notice-modal-head{display:flex;align-items:flex-start;justify-content:space-between;padding:22px 24px 15px;gap:16px;border-bottom:1px solid #ffffff23}
+.party-notice-modal-head h2{font-size:clamp(18px,3vw,26px);margin:4px 0;line-height:1.4;overflow-wrap:anywhere}
+.party-notice-modal-meta{color:#d3b37b;font-size:12px}
+.party-modal-close{background:#ffffff15;color:#fff;border:1px solid #ffffff3b;border-radius:10px;padding:9px 12px;cursor:pointer;flex-shrink:0;font-size:17px}
+.party-notice-modal-body{overflow-y:auto;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.9;font-size:15px;padding:20px 24px 32px}
+body.party-notice-modal-open{overflow:hidden}
+.party-admin-shortcut:not([hidden]){color:#ebcb94!important;font-weight:750}
+@media(max-width:600px){.party-notice-modal{padding:12px}.party-notice-modal-head{padding:18px}.party-notice-modal-body{padding:18px;font-size:14px}.party-notice-dialog{max-height:88dvh}}

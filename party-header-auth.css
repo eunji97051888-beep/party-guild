@@ -1,0 +1,13 @@
+/* 메인 홈페이지 전용 Google 인증 메뉴 */
+.party-header-auth{display:inline-flex;align-items:center;gap:7px;min-width:0;flex-wrap:wrap}
+.party-header-auth [hidden]{display:none!important}
+.party-auth-btn{background:#cba364;border:1px solid #f0ca87;color:#15213b;border-radius:9px;padding:8px 12px;min-height:35px;font:inherit;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap}
+.party-auth-btn:hover{background:#f0ca87}
+.party-auth-btn:disabled{opacity:.6;cursor:wait}
+.party-auth-account{color:#f2dab1;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
+.party-header-auth .party-auth-btn:nth-of-type(2){background:transparent;color:#ead3b0;border-color:#89734d}
+.party-header-auth .party-auth-btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.party-header-auth-note{color:#f5ce93;font-size:11px;flex-basis:100%;max-width:360px}
+.party-header-auth-note:empty{display:none}
+@media(max-width:850px){.party-header-auth{justify-content:center}.party-auth-account{max-width:90px}}
+@media(max-width:600px){.party-header-auth{gap:5px}.party-auth-btn{min-height:38px;padding:7px 10px}.party-auth-account{max-width:115px}}
