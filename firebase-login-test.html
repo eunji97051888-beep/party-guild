@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>파티 문파 · Firebase 관리자 로그인 테스트</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,'Malgun Gothic',sans-serif;background:radial-gradient(ellipse at top,#344263,#141d32 70%);color:#f4f1e9;display:grid;place-items:center;padding:24px}.panel{width:min(560px,100%);border:1px solid #687395;border-radius:18px;background:#202b44;padding:32px;box-shadow:0 22px 60px #0005}.kicker{color:#eac184;font-size:12px;letter-spacing:2px;font-weight:800}h1{margin:10px 0 12px;font-size:27px}p{line-height:1.7;color:#bfc9de}button{border:0;border-radius:9px;padding:12px 18px;background:#ebc185;color:#1a2537;font-weight:800;cursor:pointer;font-size:15px}button.secondary{background:#354763;color:#fff}button:disabled{opacity:.5;cursor:wait}.actions{display:flex;flex-wrap:wrap;gap:10px}.status{margin:22px 0 0;padding:12px;background:#17243a;border-radius:8px;color:#dbe4f6;white-space:pre-wrap;overflow-wrap:anywhere}.result{background:#142139;border:1px solid #556580;padding:18px;margin-top:14px;border-radius:12px}.result label{display:block;font-size:12px;color:#b3bdd2;margin-bottom:6px}.uid{font-family:ui-monospace,Consolas,monospace;overflow-wrap:anywhere;color:#ffe0a9;font-size:16px}.hint{font-size:12px}a{color:#f1c583}
+</style>
+</head>
+<body>
+<main class="panel">
+<div class="kicker">PARTY · FIREBASE TEST</div>
+<h1>문주 로그인 확인</h1>
+<p>기존 파티 문파 홈페이지는 변경하지 않는 <b>독립 테스트 페이지</b>야. 아래 버튼으로 Google 로그인을 완료하면 Firebase 사용자 UID를 확인할 수 있어.</p>
+<div class="actions"><button id="login" disabled>Google로 로그인</button><button id="logout" class="secondary" hidden>로그아웃</button></div>
+<div id="status" class="status" role="status">Firebase 연결 준비 중...</div>
+<div id="result" class="result" hidden>
+<label>로그인한 계정</label><div id="account"></div>
+<label style="margin-top:14px">Firebase 사용자 UID</label><div id="uid" class="uid"></div>
+<div class="actions" style="margin-top:15px"><button id="copy" class="secondary">UID 복사</button></div>
+</div>
+<p class="hint">주의: 이 페이지는 <b>로그인 확인용</b>이며 Firestore 데이터를 읽거나 쓰지 않아. UID가 보인다고 관리자 권한이 자동으로 부여되는 건 아니야. UID와 계정 정보를 불특정 다수에게 공개하지 마.</p>
+<p class="hint"><a href="index.html">← 파티 문파 홈페이지로 돌아가기</a></p>
+</main>
+<script type="module">
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js';
+import {getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut} from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
+const firebaseConfig={
+ apiKey:'AIzaSyD_JzuNnKKuc-NU26KatxO2jqZCUVAebPE',
+ authDomain:'party-guild.firebaseapp.com',
+ projectId:'party-guild',
+ storageBucket:'party-guild.firebasestorage.app',
+ messagingSenderId:'465332308360',
+ appId:'1:465332308360:web:50b5663dc1563df3d6923d'
+};
+const $=id=>document.getElementById(id);const status=$('status');
+try{
+ const app=initializeApp(firebaseConfig);
+ const auth=getAuth(app);
+ const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});
+ onAuthStateChanged(auth,user=>{
+   $('login').disabled=false;
+   $('login').hidden=!!user;$('logout').hidden=!user;$('result').hidden=!user;
+   if(user){$('account').textContent=user.email||user.displayName||'로그인됨';$('uid').textContent=user.uid;status.textContent='✅ Firebase Google 로그인 성공! 사용자 UID가 발급되었어.';}
+   else{status.textContent='로그인 준비 완료. Google로 로그인 버튼을 눌러줘.';$('uid').textContent='';$('account').textContent='';}
+ },error=>status.textContent='인증 상태 확인 오류: '+(error.message||String(error)));
+ $('login').addEventListener('click',async()=>{
+  $('login').disabled=true;status.textContent='Google 로그인 창을 여는 중...';
+  try{await signInWithPopup(auth,provider)}catch(e){status.textContent='로그인 실패 ('+(e.code||'오류')+'): '+(e.message||'')+'\n팝업 차단 여부와 Firebase 승인된 도메인을 확인해 줘.';$('login').disabled=false}
+ });
+ $('logout').addEventListener('click',async()=>{try{await signOut(auth)}catch(e){status.textContent='로그아웃 실패: '+e.message}});
+ $('copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('uid').textContent);status.textContent='UID 복사 완료.'}catch(e){status.textContent='자동 복사가 차단됐어. UID 글자를 선택해서 복사해 줘.'}});
+}catch(e){status.textContent='Firebase 초기화 오류: '+(e.message||String(e))}
+</script>
+</body></html>
