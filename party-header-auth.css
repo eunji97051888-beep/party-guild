@@ -11,3 +11,15 @@
 .party-header-auth-note:empty{display:none}
 @media(max-width:850px){.party-header-auth{justify-content:center}.party-auth-account{max-width:90px}}
 @media(max-width:600px){.party-header-auth{gap:5px}.party-auth-btn{min-height:38px;padding:7px 10px}.party-auth-account{max-width:115px}}
+
+/* V19 모바일 수정: 문주 바로가기를 Google 로그인 영역에 묶어 배치 */
+.party-header-auth .party-auth-admin{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;text-decoration:none;background:#243955;border:1px solid #d9b675;color:#ffe2aa;min-height:35px}
+.party-header-auth .party-auth-admin[hidden]{display:none!important}
+@media(max-width:850px){
+ .party-header-auth{display:flex;flex-wrap:wrap;max-width:100%;justify-content:center;gap:7px}
+ .party-header-auth .party-auth-admin{flex:0 0 auto;min-height:40px;white-space:nowrap}
+}
+@media(max-width:600px){
+ .party-header-auth .party-auth-admin{font-size:12px;padding:9px 12px}
+ .party-header-auth .party-auth-account{max-width:100px}
+}
