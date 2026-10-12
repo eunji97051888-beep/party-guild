@@ -1,0 +1,59 @@
+/* PARTY V20: mobile navigation labels must stay on one line.
+   Keep the existing header, Firebase login and floating admin shortcut intact. */
+@media (max-width: 850px) {
+  .topbar nav[aria-label="메뉴"] > a {
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    overflow-wrap: normal !important;
+    flex-shrink: 0 !important;
+  }
+  .topbar nav[aria-label="메뉴"] {
+    min-width: 0;
+  }
+}
+@media (max-width: 600px) {
+  /* Make the navigation a horizontal scroller instead of squeezing labels. */
+  .topbar .top-inner {
+    flex-wrap: wrap !important;
+    row-gap: 6px;
+  }
+  .topbar .brand {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .topbar nav[aria-label="메뉴"] {
+    order: 3;
+    width: 100%;
+    max-width: 100%;
+    flex: 1 0 100%;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center;
+    gap: 16px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+    padding: 5px 0 9px;
+  }
+  .topbar nav[aria-label="메뉴"] > a {
+    display: inline-flex !important;
+    align-items: center;
+    width: auto !important;
+    min-width: max-content !important;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  /* Keep Google login/logout outside the overflowing menu on small screens. */
+  .topbar nav[aria-label="메뉴"] .party-header-auth {
+    flex: 0 0 auto;
+    min-width: max-content;
+    flex-wrap: nowrap;
+    position: sticky;
+    right: 0;
+    z-index: 3;
+    background: #101936;
+    padding: 2px 0 2px 8px;
+  }
+  .topbar .top-cta { display: none !important; }
+}
