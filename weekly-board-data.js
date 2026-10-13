@@ -180,7 +180,7 @@ window.PARTY_WEEKLY_BOARD = {
     },
     {
       "id": "e-1791854929300-6",
-      "title": "요신,결계지",
+      "title": "요신 토벌령, 결계지 방어",
       "subtitle": "",
       "time": "20:30",
       "kind": "guild",
