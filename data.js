@@ -73,6 +73,10 @@ window.PARTY_DEFAULT = {
     {
       "title": "광역 사냥",
       "id": "idv31zdxnz4"
+    },
+    {
+      "title": "여러 도술트리",
+      "id": "zUxrGbe9Q-U"
     }
   ]
 };
