@@ -1,0 +1,19 @@
+/* PARTY activity news v31 */
+.activity-news-list{display:grid;gap:14px;margin-top:16px}
+.activity-news-card{border:1px solid rgba(219,180,109,.32);background:linear-gradient(125deg,rgba(40,49,70,.94),rgba(29,38,57,.96));padding:17px 18px;border-radius:12px;color:#f5ebd9;min-width:0}
+.activity-news-card h4{margin:0;font-size:16px;color:#ffdc9e;overflow-wrap:anywhere}
+.activity-news-meta{font-size:12px;color:#bac8d9;margin:0 0 9px}
+.activity-news-text{margin:12px 0;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
+.activity-news-photos{display:flex;gap:9px;overflow-x:auto;padding:4px 0 8px}
+.activity-news-photos img{display:block;width:150px;height:112px;object-fit:cover;border:1px solid #8d7592;border-radius:9px;cursor:zoom-in}
+.activity-news-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.activity-news-links a{display:inline-block;background:#564b70;border:1px solid #a899ca;padding:8px 13px;border-radius:8px;color:#fff0ce;text-decoration:none;font-weight:700;font-size:13px}
+.activity-news-pagination{display:flex;justify-content:flex-end;gap:6px;flex-wrap:wrap;margin-top:17px}
+.activity-news-pagination button{min-width:34px;padding:7px 10px;border-radius:7px;background:#273852;border:1px solid #89799d;color:#f9ead4;cursor:pointer}
+.activity-news-pagination button[aria-current="page"]{background:#bd8d45;color:#150e06;border-color:#ebc77f;font-weight:bold}
+.activity-news-empty{padding:22px;border:1px dashed #84728b;border-radius:10px;color:#d2c3cf}
+.activity-photo-modal{position:fixed;inset:0;z-index:999999;background:rgba(5,8,15,.96);display:flex;align-items:center;justify-content:center;padding:30px}
+.activity-photo-modal[hidden]{display:none}
+.activity-photo-modal img{max-width:100%;max-height:90vh;object-fit:contain}
+.activity-photo-modal button{position:absolute;top:14px;right:15px;background:#fff;border:0;border-radius:50%;font-size:22px;width:42px;height:42px;cursor:pointer}
+@media(max-width:600px){.activity-news-card{padding:13px}.activity-news-photos img{width:124px;height:102px}}

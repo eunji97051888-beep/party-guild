@@ -1,0 +1,1 @@
+window.PARTY_ACTIVITY_NEWS = [];
