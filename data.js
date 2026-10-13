@@ -68,7 +68,14 @@ window.PARTY_DEFAULT = {
       "pinned": false
     }
   ],
-  "resources": [],
+  "resources": [
+    {
+      "title": "깨비지지",
+      "url": "https://kkaebigg.com/",
+      "description": "",
+      "image": "https://forum.kakaogames.com/dokkaebi/postView/?code=event&id=9217"
+    }
+  ],
   "videos": [
     {
       "title": "광역 사냥",
