@@ -92,6 +92,18 @@ window.PARTY_DEFAULT = {
     {
       "title": "여러 도술트리",
       "id": "zUxrGbe9Q-U"
+    },
+    {
+      "title": "꿀팁",
+      "id": "FMK80PasOEo"
+    },
+    {
+      "title": "꿀팁",
+      "id": "82vyzvSzlSk"
+    },
+    {
+      "title": "꿀팁",
+      "id": "0uKUAi7P5Fg"
     }
   ]
 };
