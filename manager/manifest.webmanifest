@@ -1,0 +1,26 @@
+{
+  "id": "/party-guild/manager/",
+  "name": "파티 문주",
+  "short_name": "파티 문주",
+  "description": "파티 문파 운영을 위한 관리자 바로가기",
+  "lang": "ko",
+  "start_url": "/party-guild/manager/index.html",
+  "scope": "/party-guild/manager/",
+  "display": "standalone",
+  "background_color": "#121a33",
+  "theme_color": "#2b2249",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
