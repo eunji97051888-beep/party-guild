@@ -1,1 +1,15 @@
-#partyPwaInstall{cursor:pointer}#partyPwaGuide{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99999;align-items:center;justify-content:center;padding:18px}#partyPwaGuide[data-open="true"]{display:flex}#partyPwaGuide .pwa-guide-card{box-sizing:border-box;background:#202943;border:1px solid #bd985b;border-radius:18px;color:#f9eddb;padding:25px;width:min(430px,100%);box-shadow:0 12px 45px #0008;line-height:1.65}#partyPwaGuide h3{color:#efc879;margin:0 0 12px}#partyPwaGuide button{background:#d8aa62;color:#131924;border:none;border-radius:10px;font-weight:700;padding:10px 18px;cursor:pointer}#partyPwaInstall.btn{font:inherit}
+/* Floating PWA install invitation — independent of page layout */
+#partyPwaFloat{position:fixed;right:14px;bottom:calc(18px + env(safe-area-inset-bottom, 0px));z-index:9800;display:flex;align-items:center;gap:10px;max-width:min(350px,calc(100vw - 28px));padding:10px 11px;border:1px solid rgba(225,182,115,.65);border-radius:16px;background:rgba(29,36,57,.97);box-shadow:0 10px 35px #0009;color:#fff5e8;box-sizing:border-box;font-family:inherit;backdrop-filter:blur(10px)}
+#partyPwaFloat[hidden]{display:none!important}
+#partyPwaFloat .party-pwa-mark{width:43px;height:43px;flex:none;border-radius:11px;object-fit:cover}
+#partyPwaFloat .party-pwa-copy{display:flex;flex-direction:column;min-width:0;gap:3px}
+#partyPwaFloat .party-pwa-title{font-size:13px;font-weight:800;line-height:1.3;white-space:nowrap}
+#partyPwaFloat .party-pwa-sub{font-size:11px;color:#d3d7e2;line-height:1.35}
+#partyPwaInstall{border:1px solid #e9c488;border-radius:9px;background:#d9ab66;color:#1d2232;font:inherit;font-weight:800;font-size:12px;padding:8px 10px;white-space:nowrap;cursor:pointer;flex:none}
+#partyPwaDismiss{align-self:flex-start;border:0;color:#e1e5ef;background:none;font:inherit;font-size:18px;line-height:18px;padding:0 0 4px 2px;cursor:pointer}
+#partyPwaGuide{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:99999;align-items:center;justify-content:center;padding:18px}
+#partyPwaGuide[data-open="true"]{display:flex}
+#partyPwaGuide .pwa-guide-card{box-sizing:border-box;background:#202943;border:1px solid #bd985b;border-radius:18px;color:#f9eddb;padding:25px;width:min(430px,100%);box-shadow:0 12px 45px #0008;line-height:1.65}
+#partyPwaGuide h3{color:#efc879;margin:0 0 12px}
+#partyPwaGuide button{background:#d8aa62;color:#131924;border:none;border-radius:10px;font-weight:700;padding:10px 18px;cursor:pointer}
+@media(max-width:600px){#partyPwaFloat{right:10px;bottom:calc(14px + env(safe-area-inset-bottom, 0px));gap:8px;padding:8px 9px;border-radius:14px;max-width:calc(100vw - 20px)}#partyPwaFloat .party-pwa-mark{width:36px;height:36px}#partyPwaFloat .party-pwa-sub{font-size:10px}#partyPwaInstall{padding:7px 8px}}

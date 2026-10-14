@@ -52,6 +52,14 @@ window.PARTY_DEFAULT = {
       "time": "22:00",
       "name": "요화선녀",
       "type": "낙화의 전장"
+    },
+    {
+      "days": [
+        0
+      ],
+      "time": "20:30",
+      "name": "요신 토벌령, 결계지 방",
+      "type": "문파 콘텐츠"
     }
   ],
   "notices": [
