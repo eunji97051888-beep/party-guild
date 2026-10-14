@@ -1,11 +1,25 @@
-/* 파티 문파 공지사항 + 요약 보고서: 데스크톱 2열, 모바일 1열 */
+/* Existing two-column page layout preserved. */
 .guild-updates-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:stretch;margin-top:18px}
 .guild-updates-grid>.panel{min-width:0;margin:0!important;height:100%;box-sizing:border-box}
 .guild-updates-grid .panel-title{flex-wrap:wrap}
-.yechi-report{display:flex;flex-direction:column;gap:0}
+.yechi-report{display:flex;flex-direction:column;gap:8px;min-width:0}
 .yechi-report .panel-title h3{line-height:1.4;overflow-wrap:anywhere}
-.yechi-report-image{display:flex;position:relative;flex:1;min-height:175px;max-height:330px;margin-top:8px;overflow:hidden;border:1px solid rgba(230,190,117,.3);border-radius:12px;background:#172137;align-items:center;justify-content:center;text-decoration:none}
-.yechi-report-image img{display:block;width:100%;height:100%;max-height:330px;object-fit:contain;object-position:center;transition:transform .2s}
-.yechi-report-image:hover img{transform:scale(1.025)}
-.yechi-report-image span{position:absolute;bottom:9px;right:9px;padding:8px 12px;border-radius:8px;background:rgba(15,25,43,.9);border:1px solid #bc9861;color:#f9dda7;font-size:12px;font-weight:700}
-@media(max-width:760px){.guild-updates-grid{grid-template-columns:minmax(0,1fr);gap:12px;margin-top:12px}.yechi-report-image{max-height:260px;min-height:160px}.yechi-report-image img{max-height:260px}}
+.yechi-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-content:start}
+.yechi-tile{display:flex;flex-direction:column;min-width:0;padding:6px;border:1px solid rgba(230,190,117,.34);border-radius:10px;color:#f4daa8;background:#1e2940;cursor:pointer;text-align:left;font:inherit;gap:7px}
+.yechi-tile:hover{border-color:#efcb8b;background:#28334e}
+.yechi-tile img{width:100%;height:120px;object-fit:cover;object-position:top;border-radius:6px;background:#fff}
+.yechi-tile span{font-size:12px;line-height:1.4;font-weight:700;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:32px}
+.yechi-pager{display:flex;gap:6px;justify-content:center;margin-top:auto;padding-top:8px;flex-wrap:wrap}
+.yechi-pager button,.yechi-edit-buttons button{border:1px solid #a5875c;border-radius:7px;background:#22314b;color:#f3d9a7;padding:6px 11px;cursor:pointer}
+.yechi-pager button.active{background:#daba86;color:#1b2536}.yechi-pager button:disabled{opacity:.3;cursor:default}
+.yechi-overlay{position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,.88);display:flex;justify-content:center;align-items:center;padding:16px}
+.yechi-dialog{width:min(100%,1080px);max-height:96vh;display:flex;flex-direction:column;align-items:stretch;gap:8px;color:#fff}
+.yechi-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.yechi-dialog-head button{border:1px solid #efcc8b;border-radius:7px;background:#26334b;color:#fff;padding:8px;cursor:pointer}
+.yechi-dialog img{object-fit:contain;max-width:100%;max-height:calc(96vh - 60px);align-self:center;overflow:auto}
+.yechi-edit-list{display:grid;gap:8px;margin:16px 0}
+.yechi-edit-row{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid #9b7a4b;border-radius:10px;flex-wrap:wrap}
+.yechi-edit-row img{width:74px;height:72px;object-fit:cover;object-position:top;border-radius:5px}
+.yechi-edit-row input{flex:1;min-width:160px;padding:10px;border-radius:7px}
+.yechi-edit-buttons{display:flex;gap:5px}
+@media(max-width:760px){.guild-updates-grid{grid-template-columns:minmax(0,1fr);gap:12px;margin-top:12px}.yechi-tile img{height:110px}}
