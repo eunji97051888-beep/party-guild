@@ -1,7 +1,7 @@
 name: Update official game notices
 on:
   schedule:
-    - cron: '17 */4 * * *'
+    - cron: '17 * * * *'
   workflow_dispatch:
 permissions:
   contents: write
