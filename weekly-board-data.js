@@ -219,17 +219,17 @@ window.PARTY_WEEKLY_BOARD = {
       }
     },
     {
-      "id": "e-1791861352427-8",
-      "title": "요신 , 결계지",
-      "subtitle": "이번주만 화, 일 진행",
-      "time": "20:20",
+      "id": "e-1792143279343-8",
+      "title": "주간 초기화",
+      "subtitle": "스펙업하는날",
+      "time": "05:00",
       "kind": "guild",
       "days": [
         2
       ],
       "placements": {
         "2": {
-          "row": 5,
+          "row": 1,
           "span": 1
         }
       }
