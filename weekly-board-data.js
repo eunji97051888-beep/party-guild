@@ -103,13 +103,17 @@ window.PARTY_WEEKLY_BOARD = {
     {
       "id": "demo-dragon",
       "days": [
-        5
+        4
       ],
       "time": "20:20",
       "title": "신기 쟁탈전",
       "subtitle": "",
       "kind": "dragon",
       "placements": {
+        "4": {
+          "row": 5,
+          "span": 1
+        },
         "5": {
           "row": 6,
           "span": 1
@@ -119,7 +123,7 @@ window.PARTY_WEEKLY_BOARD = {
     {
       "id": "demo-garden",
       "days": [
-        4
+        5
       ],
       "time": "20:20",
       "title": "미혹의 정원",
@@ -128,6 +132,10 @@ window.PARTY_WEEKLY_BOARD = {
       "placements": {
         "4": {
           "row": 5,
+          "span": 1
+        },
+        "5": {
+          "row": 6,
           "span": 1
         }
       }
@@ -217,11 +225,11 @@ window.PARTY_WEEKLY_BOARD = {
       "time": "20:20",
       "kind": "guild",
       "days": [
-        1
+        2
       ],
       "placements": {
-        "1": {
-          "row": 6,
+        "2": {
+          "row": 5,
           "span": 1
         }
       }
