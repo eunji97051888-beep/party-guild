@@ -1,1 +1,65 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>파티 문파 | 출석 현황</title><link rel="stylesheet" href="attendance-view.css?v=32"></head><body><header class="bar"><a href="index.html">← 파티 문파 홈페이지</a><strong>파티 <small>PARTY · ATTENDANCE</small></strong><span>문파원 공개 조회</span></header><main><p class="eyebrow">PUBLIC ATTENDANCE · READ ONLY</p><h1>⚔️ 콘텐츠 출석 현황</h1><p class="intro">문주가 게시한 회차별 출석 내역이야. 이 페이지에서는 누구도 출석을 수정할 수 없어.</p><div class="stamp" id="stamp">게시된 출석 자료 확인 중…</div><div id="attendView" class="grid" aria-live="polite"></div><p class="foot">출석 기록에 이견이 있으면 문주에게 알려줘. 업데이트는 문주가 공개용 파일을 다시 업로드한 뒤 반영돼.</p></main><script src="attendance-public-data.js?v=32"></script><script defer src="attendance-view.js?v=32"></script></body></html>
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#1b2437">
+  <title>파티 문파 | 콘텐츠 출석 현황</title>
+  <link rel="stylesheet" href="attendance-view.css?v=20261016-date-view">
+</head>
+<body>
+  <header class="bar">
+    <a href="index.html">← 파티 문파 홈페이지</a>
+    <strong>파티 <small>PARTY · ATTENDANCE</small></strong>
+    <span>문파원 공개 조회</span>
+  </header>
+
+  <main>
+    <p class="eyebrow">PUBLIC ATTENDANCE · READ ONLY</p>
+    <h1>⚔️ 콘텐츠 출석 현황</h1>
+    <p class="intro">출석일을 선택하고, 콘텐츠의 <strong>출석 현황 보기</strong>를 누르면 문파원 명단을 크게 볼 수 있어.</p>
+    <div class="stamp" id="stamp" role="status">게시된 출석 자료 확인 중…</div>
+
+    <section class="date-panel" aria-label="출석 날짜 선택">
+      <div>
+        <p class="panel-caption">조회할 출석 날짜</p>
+        <div class="date-controls">
+          <button type="button" id="olderDate" aria-label="이전 출석 날짜">‹ 이전</button>
+          <label class="sr-only" for="dateSelect">출석 날짜</label>
+          <select id="dateSelect" aria-label="출석 날짜 선택"><option>불러오는 중…</option></select>
+          <button type="button" id="newerDate" aria-label="다음 출석 날짜">다음 ›</button>
+        </div>
+      </div>
+      <div id="dateMeta" class="date-meta" aria-live="polite"></div>
+    </section>
+
+    <div id="attendView" class="overview-grid" aria-live="polite"></div>
+    <p class="foot">출석 내용에 이견이 있다면 문주에게 알려줘. 공개 기록은 문주가 갱신한 파일을 기준으로 표시돼.</p>
+  </main>
+
+  <dialog id="attendanceDialog" class="attendance-dialog" aria-labelledby="dialogTitle">
+    <div class="dialog-layout">
+      <header class="dialog-header">
+        <div>
+          <p class="dialog-eyebrow">PARTY · ATTENDANCE DETAIL</p>
+          <h2 id="dialogTitle">콘텐츠 출석 현황</h2>
+          <p id="dialogSubtitle" class="dialog-subtitle"></p>
+        </div>
+        <button type="button" id="closeDialog" class="close-dialog" aria-label="출석 상세 닫기">✕</button>
+      </header>
+      <div id="roundNav" class="round-nav"></div>
+      <div id="statusSummary" class="summary-bar"></div>
+      <div class="dialog-body">
+        <div id="statusFilters" class="status-filters" aria-label="출석 상태 필터"></div>
+        <div id="memberList" class="member-list"></div>
+      </div>
+      <footer class="dialog-footer">
+        <span>공개된 기록은 읽기 전용이야.</span>
+        <button type="button" id="bottomCloseDialog">닫기</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <script defer src="attendance-view.js?v=20261016-date-view"></script>
+</body>
+</html>
