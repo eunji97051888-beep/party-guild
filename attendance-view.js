@@ -12,6 +12,7 @@ const mk=(tag,cls,content)=>{const n=document.createElement(tag);if(cls)n.classN
 const statusKey=raw=>Object.prototype.hasOwnProperty.call(labels,raw)?raw:'missing';
 const dateText=raw=>{if(!/^\d{4}-\d\d-\d\d$/.test(raw||''))return raw||'날짜 미지정';const d=new Date(raw+'T12:00:00');return Number.isNaN(d.getTime())?raw:d.toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'})};
 const stat=s=>{const result={present:0,absent:0,exempt:0,missing:0};for(const m of s.members||[])result[statusKey(m.status)]++;return result};
+const requestedDate=new URLSearchParams(window.location.search).get('date')||'';
 let sessions=[],dates=[],activeDate='',activeSession=null,activeFilter='all',lastOpener=null;
 
 function showError(message){stamp.textContent=message;area.replaceChildren(mk('p','empty','잠시 후 새로고침해 줘. 계속된다면 공개 출석 파일을 확인해야 해.'));dateSelect.disabled=older.disabled=newer.disabled=true;}
@@ -23,7 +24,7 @@ function prepare(raw){
  let published='';try{published=new Date(raw.publishedAt).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})}catch{}
  stamp.textContent='마지막 게시: '+(published||'날짜 확인 불가')+' · 공개된 회차 '+sessions.length+'건';
  dateSelect.replaceChildren(...dates.map(date=>{const opt=mk('option','',dateText(date));opt.value=date;return opt}));
- activeDate=dates[0];dateSelect.value=activeDate;renderDate();
+ activeDate=dates.includes(requestedDate)?requestedDate:dates[0];dateSelect.value=activeDate;renderDate();
 }
 function latestFirst(a,b){return (b.date||'').localeCompare(a.date||'')||b._index-a._index}
 function renderDate(){
