@@ -14,7 +14,6 @@ const dateText=raw=>{if(!/^\d{4}-\d\d-\d\d$/.test(raw||''))return raw||'날짜 �
 const stat=s=>{const result={present:0,absent:0,exempt:0,missing:0};for(const m of s.members||[])result[statusKey(m.status)]++;return result};
 const requestedDate=new URLSearchParams(window.location.search).get('date')||'';
 let sessions=[],dates=[],activeDate='',activeSession=null,activeFilter='all',lastOpener=null;
-
 function showError(message){stamp.textContent=message;area.replaceChildren(mk('p','empty','잠시 후 새로고침해 줘. 계속된다면 공개 출석 파일을 확인해야 해.'));dateSelect.disabled=older.disabled=newer.disabled=true;}
 function prepare(raw){
  if(!raw||!Array.isArray(raw.sessions)){showError('공개 출석 데이터를 불러오지 못했어.');return}
@@ -27,6 +26,11 @@ function prepare(raw){
  activeDate=dates.includes(requestedDate)?requestedDate:dates[0];dateSelect.value=activeDate;renderDate();
 }
 function latestFirst(a,b){return (b.date||'').localeCompare(a.date||'')||b._index-a._index}
+// 카드의 회차 번호와 상세 창의 번호를 모두 '해당 콘텐츠의 전체 누적 회차'로 맞춘다.
+function contentRoundIndex(s){
+ const sorted=sessions.filter(item=>item.content===s.content).sort((a,b)=>(a.date||'').localeCompare(b.date||'')||a._index-b._index);
+ return {number:sorted.findIndex(item=>item._index===s._index)+1,total:sorted.length};
+}
 function renderDate(){
  dateSelect.value=activeDate;const position=dates.indexOf(activeDate);
  older.disabled=position===dates.length-1;newer.disabled=position===0;
@@ -40,8 +44,9 @@ function renderDate(){
  area.replaceChildren();
  if(!contents.length){area.append(mk('p','empty','선택한 날짜의 공개 기록이 없어.'));return}
  for(const content of contents){const entries=byContent.get(content).sort(latestFirst),s=entries[0],count=stat(s);
+  const round=contentRoundIndex(s);
   const card=mk('section','overview-card'+(contents.length===1?' one':''));
-  const heading=mk('div','card-heading'),text=mk('div'),h2=mk('h2','',content),sub=mk('div','round-label',s.label||'회차 정보 없음'),pill=mk('span','round-pill',entries.length+'회차');
+  const heading=mk('div','card-heading'),text=mk('div'),h2=mk('h2','',content),sub=mk('div','round-label',s.label||'회차 정보 없음'),pill=mk('span','round-pill',round.number+'회차');
   text.append(h2,sub);heading.append(text,pill);card.append(heading);
   const stats=mk('div','card-stats');for(const key of displayOrder){const item=mk('div','card-stat '+key);item.append(mk('strong','',count[key]),mk('span','',labels[key]));stats.append(item)}card.append(stats);
   const view=mk('button','view-button','출석 현황 크게 보기 ↗');view.type='button';view.setAttribute('aria-label',`${content} ${dateText(activeDate)} 출석 현황 크게 보기`);view.addEventListener('click',()=>openDetail(s,view));card.append(view);
