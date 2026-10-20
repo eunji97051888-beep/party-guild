@@ -25,7 +25,8 @@
    '<div class="field"><label>'+ (isVideo?'유튜브 주소':'링크 주소') +'</label><input class="item-url" type="url" style="width:100%" placeholder="https://..."></div>'+(isVideo?'':'<div class="field"><label>사이트 설명 (선택)</label><input class="item-description" maxlength="200" style="width:100%" placeholder="사이트 소개"></div><div class="field"><label>썸네일 이미지 주소 (선택)</label><input class="item-image" type="url" style="width:100%" placeholder="https://...png"></div>');
   if(!isVideo){node.querySelector('.item-description').value=item.description||'';node.querySelector('.item-image').value=item.image||'';}node.querySelector('.item-title').value=item.title||'';node.querySelector('.item-url').value=item.url||(isVideo&&item.id?'https://www.youtube.com/watch?v='+item.id:'');
   node.querySelector('.item-delete').onclick=()=>{if(confirm('이 항목을 삭제할까?'))node.remove()};
-  $(isVideo?'videoRows':'linkRows').append(node);
+  // Storage stays oldest-first; show newly registered videos first.
+  if(isVideo)$('videoRows').prepend(node);else $('linkRows').append(node);
  }
  window.PARTY_SET_MEDIA_EDITOR=(kind,items)=>{const id=kind==='video'?'videoRows':'linkRows';$(id).replaceChildren();(items||[]).forEach(v=>compactRow(kind==='video'?'video':'link',v));};
  $('addLink').onclick=()=>compactRow('link');$('addVideo').onclick=()=>compactRow('video');
@@ -43,7 +44,7 @@
  if(!quoteTitle){report('문파 안내 상자의 큰 글씨를 입력해 줘.',$('quoteTitleInput'));return}
  const notices=[...$('noticeRows').children].map(el=>({title:el.querySelector('.notice-title').value.trim(),body:el.querySelector('.notice-body').value.trim(),date:el.querySelector('.notice-date').value,pinned:el.querySelector('.notice-pinned').checked}));
  if(notices.some(n=>!n.title||!n.body)){report('제목이나 내용이 빈 공지가 있어. 입력하거나 삭제해 줘.',$('noticeRows'));return}
- const resources=gatherItems('linkRows');const enteredVideos=gatherItems('videoRows');
+ const resources=gatherItems('linkRows');const enteredVideos=gatherItems('videoRows').reverse();
  if(resources.some(x=>!x.title||!validHttpUrl(x.url)||(x.image&&!validHttpUrl(x.image)))){report('자료실에 제목이 비었거나 주소가 잘못된 항목이 있어.',$('linkRows'));return}
  if(enteredVideos.some(x=>!x.title||!youtubeId(x.url))){report('유튜브 제목이나 주소가 잘못됐어. 유튜브 영상 주소의 v= 뒤 11자리 ID도 확인해 줘.',$('videoRows'));return}
  const videos=enteredVideos.map(x=>({title:x.title,id:youtubeId(x.url)}));

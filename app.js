@@ -39,7 +39,7 @@
    const body=document.createElement('div');body.className='site-body';const h=document.createElement('strong');h.textContent=r.title;const description=document.createElement('p');description.textContent=r.description||new URL(href).hostname;body.append(h,description);card.append(art,body);sites.append(card);
   }
   if(!sites.children.length){const p=document.createElement('p');p.className='notice-empty';p.textContent='등록된 추천 사이트가 아직 없어요.';sites.append(p);}
-  currentVideos=(videoItems||[]).map(v=>({title:v.title,id:youtubeID(v)})).filter(v=>v.title&&v.id);videoIndex=0;paintVideos();
+  currentVideos=(videoItems||[]).map(v=>({title:v.title,id:youtubeID(v)})).filter(v=>v.title&&v.id).reverse();videoIndex=0;paintVideos();
  };
  window.PARTY_RENDER_MEDIA(Array.isArray(data.resources)?data.resources:[],Array.isArray(data.videos)?data.videos:(window.PARTY_VIDEOS||[]));
 

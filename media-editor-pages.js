@@ -38,7 +38,7 @@
    prev.addEventListener('click',()=>{page--;render();bar.scrollIntoView({behavior:'smooth',block:'nearest'})});
    next.addEventListener('click',()=>{page++;render();bar.scrollIntoView({behavior:'smooth',block:'nearest'})});
    add.addEventListener('click',()=>{
-     const items=rows();if(items.length>lastCount){page=Math.ceil(items.length/PER_PAGE)-1;render();items.at(-1)?.openForPage?.();items.at(-1)?.querySelector('.item-title')?.focus()}
+     const items=rows();if(items.length>lastCount){const newestFirst=rootId==='videoRows';page=newestFirst?0:Math.ceil(items.length/PER_PAGE)-1;render();const added=newestFirst?items[0]:items.at(-1);added?.openForPage?.();added?.querySelector('.item-title')?.focus()}
    });
    // Firebase loads and deletes insert/remove rows; no existing value is removed by pagination.
    const observer=new MutationObserver(()=>{
