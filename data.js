@@ -104,6 +104,10 @@ window.PARTY_DEFAULT = {
     {
       "title": "꿀팁",
       "id": "0uKUAi7P5Fg"
+    },
+    {
+      "title": "21일 전에 해야할 일!",
+      "id": "QY6TJDyTQ6o"
     }
   ]
 };
