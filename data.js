@@ -108,6 +108,10 @@ window.PARTY_DEFAULT = {
     {
       "title": "21일 전에 해야할 일!",
       "id": "QY6TJDyTQ6o"
+    },
+    {
+      "title": "21일 도술 요령서에 대해서?",
+      "id": "sIaZ5MgE1xc"
     }
   ]
 };
