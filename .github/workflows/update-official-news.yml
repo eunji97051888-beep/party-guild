@@ -10,12 +10,13 @@ concurrency:
   cancel-in-progress: false
 jobs:
   update:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
       - name: Install browser
@@ -23,7 +24,16 @@ jobs:
           python -m pip install playwright==1.58.0
           python -m playwright install --with-deps chromium
       - name: Collect official announcements
+        id: collect
         run: python scripts/collect_official_news.py
+      - name: Upload collection diagnostics
+        if: failure() && steps.collect.outcome == 'failure'
+        uses: actions/upload-artifact@v7
+        with:
+          name: official-news-debug
+          path: official-news-debug/
+          if-no-files-found: warn
+          retention-days: 7
       - name: Commit updated notices only
         run: |
           if git diff --quiet -- official-news.json; then exit 0; fi
