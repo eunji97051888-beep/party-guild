@@ -55,21 +55,21 @@ window.PARTY_WEEKLY_BOARD = {
         3,
         5
       ],
-      "time": "20:00",
+      "time": "21:00",
       "title": "필드 보스",
       "subtitle": "산신 산군대호",
       "kind": "boss",
       "placements": {
         "0": {
-          "row": 3,
+          "row": 5,
           "span": 1
         },
         "3": {
-          "row": 4,
+          "row": 6,
           "span": 1
         },
         "5": {
-          "row": 4,
+          "row": 6,
           "span": 1
         }
       }
@@ -81,21 +81,21 @@ window.PARTY_WEEKLY_BOARD = {
         2,
         4
       ],
-      "time": "20:00",
+      "time": "21:00",
       "title": "필드 보스",
       "subtitle": "해골장군",
       "kind": "boss",
       "placements": {
         "1": {
-          "row": 4,
+          "row": 6,
           "span": 1
         },
         "2": {
-          "row": 3,
+          "row": 5,
           "span": 1
         },
         "4": {
-          "row": 3,
+          "row": 5,
           "span": 1
         }
       }
@@ -103,19 +103,15 @@ window.PARTY_WEEKLY_BOARD = {
     {
       "id": "demo-dragon",
       "days": [
-        4
+        5
       ],
       "time": "20:20",
       "title": "신기 쟁탈전",
       "subtitle": "",
       "kind": "dragon",
       "placements": {
-        "4": {
-          "row": 5,
-          "span": 1
-        },
         "5": {
-          "row": 6,
+          "row": 4,
           "span": 1
         }
       }
@@ -123,7 +119,7 @@ window.PARTY_WEEKLY_BOARD = {
     {
       "id": "demo-garden",
       "days": [
-        5
+        4
       ],
       "time": "20:20",
       "title": "미혹의 정원",
@@ -131,11 +127,7 @@ window.PARTY_WEEKLY_BOARD = {
       "kind": "garden",
       "placements": {
         "4": {
-          "row": 5,
-          "span": 1
-        },
-        "5": {
-          "row": 6,
+          "row": 3,
           "span": 1
         }
       }
@@ -197,7 +189,7 @@ window.PARTY_WEEKLY_BOARD = {
       ],
       "placements": {
         "6": {
-          "row": 5,
+          "row": 3,
           "span": 1
         }
       }
@@ -206,14 +198,14 @@ window.PARTY_WEEKLY_BOARD = {
       "id": "e-1791858145633-7",
       "title": "필드 보스",
       "subtitle": "산신 산군대호",
-      "time": "20:00",
+      "time": "21:00",
       "kind": "boss",
       "days": [
         6
       ],
       "placements": {
         "6": {
-          "row": 3,
+          "row": 5,
           "span": 1
         }
       }
