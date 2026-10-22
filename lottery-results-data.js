@@ -1,0 +1,1 @@
+window.PARTY_LOTTERY_RESULTS = [];

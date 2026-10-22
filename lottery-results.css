@@ -1,0 +1,19 @@
+
+:root{color-scheme:dark;font-family:"Malgun Gothic",sans-serif;background:#1c2535;color:#f3e9d8}
+*{box-sizing:border-box}body{margin:0}.wrap{max-width:1060px;margin:auto;padding:22px 18px 60px}
+a{color:#f6cb80}header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-size:clamp(26px,4vw,38px);color:#f6c574;margin:18px 0 8px}h2{font-size:21px;color:#f6c574;margin:0 0 14px}
+.muted{color:#aebed5;font-size:14px;line-height:1.7}.banner{width:100%;max-height:240px;object-fit:cover;border-radius:16px;margin:18px 0}
+.panel{background:#24324a;border:1px solid #354763;border-radius:16px;padding:22px;margin:16px 0}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}.row>*{flex:1}
+input,select{background:#18273c;color:white;border:1px solid #6e7890;border-radius:9px;padding:12px;font:inherit;min-width:0}
+input[type=file]{width:100%}label{display:block;color:#f4d7a1;margin:10px 0 5px}
+button,.button{background:#f4c575;color:#1b2230;border:0;border-radius:10px;padding:12px 16px;font-weight:800;cursor:pointer;text-decoration:none;display:inline-block}
+button.secondary{background:#334c6a;color:#e6efff}button.danger{background:#703d45;color:#fff}
+.result{border:1px solid #41516b;background:#202d42;border-radius:14px;padding:20px;margin:15px 0}
+.result h3{color:#f5c574;font-size:22px;margin:4px 0 8px}
+.winners{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
+.winner{background:#2d405c;border-radius:10px;padding:14px;min-width:0;overflow-wrap:anywhere}
+.winner b{color:#f5c574}.winner strong{font-size:19px;margin-left:10px}
+.empty{text-align:center;padding:50px 10px;color:#b7c5d7}
+@media(max-width:550px){.winners{grid-template-columns:1fr}.panel{padding:15px}.winner strong{font-size:18px}}
