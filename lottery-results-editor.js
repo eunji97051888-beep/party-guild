@@ -31,9 +31,9 @@ $('add').onclick=()=>{
  const name=$('reward').value.trim();if(!name){alert('보상 이름을 입력해 줘.');return}
  const key=incoming.started_at_kst;
  if(items.some(x=>x.started_at_kst===key)&&!confirm('같은 시작 시각의 결과가 이미 있어. 그래도 추가할까?'))return;
- const next={...incoming,reward_name:name,published_at:new Date().toISOString()};
+ const next={...incoming,reward_name:name,post_title:$('postTitle').value.trim()||`${name} 분배 당첨자`,published_at:new Date().toISOString()};
  if(!confirm(`보상: ${name}\n당첨자: ${next.winners.map(w=>w.name).join(', ')}\n\n이 결과를 게시 목록에 추가할까?`))return;
- items.unshift(next);incoming=null;$('file').value='';$('reward').value='';$('preview').textContent='결과를 추가했어.';render();
+ items.unshift(next);incoming=null;$('file').value='';$('reward').value='';$('postTitle').value='';$('preview').textContent='결과를 추가했어.';render();
 };
 $('download').onclick=()=>{
  const json=JSON.stringify(items).replace(/</g,'\\u003c').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029');
