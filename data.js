@@ -10,7 +10,7 @@ window.PARTY_DEFAULT = {
         3,
         5
       ],
-      "time": "20:00",
+      "time": "21:00",
       "name": "산신 산군대호",
       "type": "필드 보스"
     },
@@ -20,7 +20,7 @@ window.PARTY_DEFAULT = {
         4,
         6
       ],
-      "time": "20:00",
+      "time": "21:00",
       "name": "해골장군",
       "type": "필드 보스"
     },
