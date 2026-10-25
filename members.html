@@ -1,26 +1,14 @@
 <!doctype html>
 <!DOCTYPE html>
-<html lang="ko"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>파티 문파 | 출석 관리</title><link href="members.css?v=11-2" rel="stylesheet"/><link href="party-mobile.css?v=12" rel="stylesheet"/></head><body><nav aria-label="모바일 빠른 이동" class="party-mobile-nav"><div class="party-mobile-nav-scroll"><a href="#member-management">👥 문파원</a><a href="#sessions">📅 회차</a><a href="#check">✅ 출석 체크</a><a href="#stats">📊 통계</a></div></nav>
+<html lang="ko"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>파티 문파 | 출석 관리</title><link href="members.css?v=11-2" rel="stylesheet"/><link href="party-mobile.css?v=12" rel="stylesheet"/><style>.memberrow{flex-wrap:wrap}.member-date-field{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#ead3ab}.member-date-field input{width:145px;max-width:100%;padding:7px;background:#1a2536;color:#fff;border:1px solid #8a7658;border-radius:6px}.prejoin-tag{font-size:12px;color:#d4b979}.state-prejoin{background:#354057;color:#d7dce7}</style></head><body><nav aria-label="모바일 빠른 이동" class="party-mobile-nav"><div class="party-mobile-nav-scroll"><a href="#member-management">👥 문파원</a><a href="#sessions">📅 회차</a><a href="#check">✅ 출석 체크</a><a href="#stats">📊 통계</a></div></nav>
 <header class="bar"><div class="bar-inner"><a class="back" href="admin.html">← 관리자 화면</a><div class="brand">파티 <small>PARTY · ATTENDANCE</small></div><a class="back" href="rewards.html">재화 · 보상 관리 ↗</a><a class="back" href="index.html">홈페이지 ↗</a></div></header>
-<main class="shell"><div class="heading"><div><span class="eyebrow">GUILD MASTER TOOLS · V11</span><h1>문파원 · 콘텐츠 출석 관리</h1><p>문파원 변경 이력을 보존하면서 콘텐츠 회차별 출석을 관리해.</p></div></div>
+<main class="shell"><div class="heading"><div><span class="eyebrow">GUILD MASTER TOOLS · V11</span><h1>문파원 · 콘텐츠 출석 관리</h1><p>문파원 변경 이력을 보존하면서 콘텐츠 회차별 출석을 관리해. 신규 가입자는 오늘 날짜가 자동 입력돼. 기존 문파원은 가입일을 비워둘 수 있어.</p></div></div>
 <div class="warning"><b>저장 방식 안내</b> · 이 페이지의 기록은 현재 브라우저에만 저장돼. 공개 GitHub에는 자동으로 올라가지 않아. PC를 바꾸거나 브라우저 데이터를 삭제하기 전에 반드시 <b>JSON 백업 다운로드</b>를 눌러 보관해. 관리자 비밀번호가 없는 페이지이므로 공용 컴퓨터에서는 사용하지 않는 걸 추천해.</div>
 <section class="panel"><div class="panelhead"><div><span class="eyebrow">BACKUP &amp; RECOVERY</span><h2>저장 · 백업 관리</h2></div><span class="pill" id="saveStatus">준비 중</span></div><div class="actions"><button class="btn primary" id="backupBtn">JSON 백업 다운로드</button><label class="btn secondary filebtn">백업 불러오기<input accept=".json,application/json" id="restoreInput" type="file"/></label></div><p class="help">입력할 때마다 현재 브라우저에 자동 저장돼. 백업 파일은 이름과 출석 내역이 포함되어 있으니 안전하게 보관해.</p></section>
 <section class="panel" id="publicExport"><div class="panelhead"><div><span class="eyebrow">PUBLIC ATTENDANCE</span><h2>문파원용 출석 현황 게시</h2></div></div><p class="help">현재 PC의 출석 내역에서 <b>공개할 닉네임과 회차별 참석 상태만</b> 내보내. GitHub에 파일을 올리면 문파원들이 읽기 전용 페이지로 볼 수 있어. 기존 JSON 백업과 별개야.</p><div class="actions"><button class="btn primary" type="button" id="publishAttendanceBtn">공개용 출석 파일 다운로드</button><a class="btn secondary" href="attendance-view.html" target="_blank" rel="noopener">문파원 화면 미리보기 ↗</a></div><p class="help">주의: 이 자료는 누구나 볼 수 있는 공개 페이지에 게시돼. 문파원에게 공개할 참석·불참 정보인지 먼저 확인해 줘.</p></section>
-<section class="panel" id="lotteryExport"><div class="panelhead"><div><span class="eyebrow">PARTY LUCKY DRAW</span><h2>🎲 행운의 전당 · 추첨용 명단</h2></div></div>
-<p class="help">이 PC의 출석 장부에서 <b>현재 재적 문파원</b>만 대상으로, 선택한 콘텐츠의 <b>참석(present)</b> 회차를 합산해 추첨권을 계산해. 탈퇴자·0회 참석자·불참·제외·미입력은 추첨 대상에서 제외돼.</p>
-<div class="actions" style="align-items:center;gap:12px;flex-wrap:wrap">
-<label for="lotteryContent">집계 콘텐츠</label>
-<select id="lotteryContent" style="min-width:200px;padding:10px;border-radius:8px;background:#152638;color:#fff;border:1px solid #9d7943">
-<option value="all">전체 콘텐츠 합산</option>
-</select>
-<button class="btn primary" type="button" id="lotteryExportBtn">🎁 추첨용 명단 JSON 다운로드</button>
-</div>
-<p class="help" id="lotteryExportSummary" aria-live="polite">현재 출석 장부를 기준으로 집계해.</p>
-<p class="help">파일을 내려받은 뒤 PC의 <b>파티 문파 행운의 전당 → 명단 불러오기</b>에서 선택해. 이 기능은 기존 출석 장부를 변경하거나 GitHub에 데이터를 공개하지 않아. 추첨 전에 집계 대상과 명단을 반드시 확인해 줘.</p>
-</section>
 <section class="panel" id="member-management"><div class="panelhead"><div><span class="eyebrow">MEMBER MANAGEMENT</span><h2>문파원 관리 <span class="count" id="memberCount"></span></h2></div><label class="filter"><input id="showInactive" type="checkbox"/> 탈퇴 문파원 보기</label></div>
 <div class="inputline"><input id="memberName" maxlength="35" placeholder="신규 문파원 닉네임"/><button class="btn primary" id="addMember">+ 문파원 추가</button></div>
-<div class="bulk"><label for="bulkNames">한 번에 여러 명 추가하기 (한 줄에 한 명)</label><textarea id="bulkNames" placeholder="문파원A
+<div class="bulk"><label for="bulkNames">한 번에 여러 명 추가하기 (한 줄에 한 명 · 오늘 가입으로 기록)</label><textarea id="bulkNames" placeholder="문파원A
 문파원B" rows="2"></textarea><button class="btn secondary" id="bulkAdd">여러 명 추가</button></div>
 <div class="memberlist" id="memberList"></div></section>
 <section class="panel" id="sessions"><div class="panelhead"><div><span class="eyebrow">CONTENT SESSIONS</span><h2>문파 콘텐츠 · 회차 관리</h2></div></div>
@@ -28,6 +16,6 @@
 <p class="help">같은 콘텐츠라도 날짜·메모가 다르면 별도 회차로 등록돼. 실수로 만든 회차는 삭제할 수 있지만 해당 회차 출석 기록도 함께 삭제돼.</p><div class="sessionlist" id="sessionList"></div></section>
 <section class="panel" id="check"><div class="panelhead"><div><span class="eyebrow">ATTENDANCE CHECK</span><h2>출석 체크</h2></div><span class="pill" id="currentSessionLabel">회차를 선택해 줘</span></div>
 <p class="help">상태: <b>참석</b> / <b>불참</b> / <b>제외</b> / <b>미입력</b>. 제외는 출석률 계산에서 분모에 포함하지 않아.</p><div id="attendanceArea"></div></section>
-<section class="panel" id="stats"><div class="panelhead"><div><span class="eyebrow">SUMMARY</span><h2>문파원별 출석 통계</h2></div></div><div class="tablewrap"><table><thead><tr><th>문파원</th><th>참석</th><th>불참</th><th>제외</th><th>미입력</th><th>출석률</th></tr></thead><tbody id="statsBody"></tbody></table></div><p class="help">출석률 = 참석 ÷ (참석 + 불참) × 100. 아직 기록하지 않은 회차는 계산에서 제외돼. V12 보상 분배 기능은 여기서 보존한 고유 문파원 ID를 활용할 예정이야.</p></section>
+<section class="panel" id="stats"><div class="panelhead"><div><span class="eyebrow">SUMMARY</span><h2>문파원별 출석 통계</h2></div></div><div class="tablewrap"><table><thead><tr><th>문파원</th><th>가입일</th><th>참석</th><th>불참</th><th>제외</th><th>미입력</th><th>가입 전</th><th>참석/기록</th><th>출석률</th></tr></thead><tbody id="statsBody"></tbody></table></div><p class="help">출석률 = 참석 ÷ (참석 + 불참) × 100. 기존 문파원은 가입일 미확인으로 유지할 수 있어. 신규 문파원은 가입일이 자동 기록되고 가입 전 회차는 분리돼. 미입력은 출석률 계산에서 제외돼. V12 보상 분배 기능은 여기서 보존한 고유 문파원 ID를 활용할 예정이야.</p></section>
 <section class="panel" id="contentStatistics"><div class="panelhead"><div><span class="eyebrow">ROUND-BY-ROUND ATTENDANCE</span><h2>콘텐츠별 회차 출석</h2></div></div><p class="help">요신토벌령 · 결계지방어 · 미혹의 정원 · 신기 쟁탈전의 회차별 출석 명단을 이전·다음 화살표로 확인할 수 있어. 전체 누적 통계는 위 문파원별 출석 통계에서 확인해.</p><div class="content-stats-grid" id="contentStats"></div></section>
-</main><script src="history-core.js?v=11"></script><script src="members.js?v=11-3"></script><script defer="" src="party-mobile.js?v=12"></script><script defer src="attendance-publish.js?v=32"></script><script defer src="lottery-export.js?v=1"></script></body></html>
+</main><script src="history-core.js?v=11"></script><script src="members.js?v=11-join-20261025"></script><script defer="" src="party-mobile.js?v=12"></script><script defer src="attendance-publish.js?v=32"></script></body></html>
