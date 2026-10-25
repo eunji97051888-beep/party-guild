@@ -22,3 +22,48 @@
 .state-exempt{background:#4c4762;color:#ddd3ff}.state-missing{background:#39445b;color:#c2cce0}
 .round-totals{color:#b9c7db;font-size:11px;margin:12px 0 0}
 @media(max-width:500px){.round-btn{min-width:67px;padding:9px 8px}.round-current strong{font-size:14px}}
+
+/* V12: 콘텐츠별 고정 회차 · 시작시간 관리. 기존 어두운 테마와 모바일 레이아웃 유지. */
+.sessions-panel{overflow:hidden}
+.session-intro{margin-top:-6px;margin-bottom:18px}
+.session-overview{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:22px}
+.session-overview-button{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:15px 7px;border-radius:11px;background:#24334f;border:1px solid #415271;color:#f2eff5;cursor:pointer;transition:border-color .15s,background .15s}
+.session-overview-button:hover,.session-overview-button:focus-visible{border-color:#dfbd85}
+.session-overview-button[aria-pressed=true]{background:#344564;border-color:#e7bf87;box-shadow:inset 0 0 0 1px #e7bf8738}
+.session-overview-name{color:#c7d4e8;font-size:12px;font-weight:700;text-align:center;overflow-wrap:anywhere}
+.session-overview-number{color:#f0cf9a;font-size:22px;font-weight:900;line-height:1.1}
+.session-create{background:#19253b;border:1px solid #3b4c6a;border-radius:12px;padding:17px;margin-bottom:23px}
+.session-create h3,.session-list-head h3{font-size:16px;margin:0 0 15px;color:#f4d8a6}
+.sessionform{grid-template-columns:minmax(130px,1.3fr) minmax(130px,1fr) minmax(120px,.8fr) minmax(85px,.65fr);gap:10px;align-items:end}
+.sessionform label{min-width:0}.sessionform label input,.sessionform label select{width:100%;min-width:0}
+.sessionform .session-memo-field{grid-column:1/4}
+.sessionform #addSession{grid-column:4;white-space:nowrap;min-height:40px;padding:9px 10px}
+.session-preview{margin:13px 0 3px;padding:12px 13px;border:1px solid #536887;background:#263750;border-radius:9px;color:#f6d7a4;font-weight:700;font-size:13px;line-height:1.6;overflow-wrap:anywhere}
+.session-create-help{margin:8px 0 0;font-size:12px}
+.session-list-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.session-list-head h3{margin:0 0 3px}.session-list-head .help{margin:0}
+.session-visible-count{color:#c0cde3;white-space:nowrap;font-size:12px;margin-top:3px}
+.session-filter{display:flex;gap:7px;flex-wrap:wrap;margin:15px 0 12px}
+.session-filter button{padding:8px 12px;border:1px solid #485a77;border-radius:999px;background:#24334f;color:#d1d9ea;font-weight:700;font-size:12px;cursor:pointer}
+.session-filter button[aria-pressed=true]{border-color:#e7bf87;background:#a78251;color:#131e32}
+.sessionlist{margin-top:10px}
+.sessionrow{display:flex;flex-wrap:wrap;padding:12px 13px;gap:12px;min-width:0}
+.sessionrow-main{flex:1;min-width:150px;display:flex;align-items:center;gap:13px}
+.session-round-badge{flex-shrink:0;min-width:65px;border-radius:8px;border:1px solid #947a50;background:#3c3a41;color:#ffda9a;text-align:center;padding:9px 8px;font-weight:900;font-size:14px}
+.session-info{min-width:0;display:flex;flex-direction:column;gap:5px;overflow-wrap:anywhere}
+.session-name{font-size:14px;font-weight:800;color:#f4f2ee}
+.session-meta{font-size:12px;color:#b4c4df}
+.session-note{font-size:12px;color:#ecd3a5}
+.session-attendance{font-size:11px;color:#b9ccdf}
+.session-row-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.session-row-actions .btn{padding:9px 12px;white-space:nowrap}
+.sessionrow.selected .session-round-badge{background:#9f7c47;color:#162136;border-color:#edc783}
+.session-edit{flex-basis:100%;width:100%;border-top:1px solid #51627d;margin-top:5px;padding-top:14px}
+.session-edit h4{font-size:13px;color:#f4d8a6;margin:0 0 10px}
+.session-edit-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.session-edit-grid label{min-width:0;font-size:12px;color:#c8d5e9;font-weight:700;display:grid;gap:5px}
+.session-edit-grid input{width:100%;min-width:0}
+.session-edit-grid .wide{grid-column:1/-1}
+.session-edit-buttons{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+@media(max-width:850px){.session-overview{grid-template-columns:repeat(2,minmax(0,1fr))}.sessionform{grid-template-columns:repeat(2,minmax(0,1fr))}.sessionform label:first-child,.sessionform label:nth-child(3){grid-column:auto}.sessionform .session-memo-field{grid-column:1/-1}.sessionform #addSession{grid-column:1/-1}}
+@media(max-width:520px){.session-create{padding:12px}.session-overview-number{font-size:19px}.sessionrow{align-items:stretch}.session-row-actions{width:100%}.session-row-actions .btn{flex:1}.session-edit-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.session-edit-grid .wide{grid-column:1/-1}}

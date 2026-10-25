@@ -27,9 +27,13 @@ function prepare(raw){
 }
 function latestFirst(a,b){return (b.date||'').localeCompare(a.date||'')||b._index-a._index}
 // 카드의 회차 번호와 상세 창의 번호를 모두 '해당 콘텐츠의 전체 누적 회차'로 맞춘다.
+function sessionChronology(a,b){
+ if(Number.isSafeInteger(a.round)&&a.round>0&&Number.isSafeInteger(b.round)&&b.round>0)return a.round-b.round;
+ return (a.date||'').localeCompare(b.date||'')||a._index-b._index;
+}
 function contentRoundIndex(s){
- const sorted=sessions.filter(item=>item.content===s.content).sort((a,b)=>(a.date||'').localeCompare(b.date||'')||a._index-b._index);
- return {number:sorted.findIndex(item=>item._index===s._index)+1,total:sorted.length};
+ const sorted=sessions.filter(item=>item.content===s.content).sort(sessionChronology);
+ return {number:Number.isSafeInteger(s.round)&&s.round>0?s.round:sorted.findIndex(item=>item._index===s._index)+1,total:sorted.length};
 }
 function renderDate(){
  dateSelect.value=activeDate;const position=dates.indexOf(activeDate);
@@ -60,13 +64,13 @@ function openDetail(s,opener){
 }
 function renderDetail(){
  const s=activeSession;if(!s)return;
- const ofContent=sessions.filter(item=>item.content===s.content).sort((a,b)=>(a.date||'').localeCompare(b.date||'')||a._index-b._index);
+ const ofContent=sessions.filter(item=>item.content===s.content).sort(sessionChronology);
  const idx=ofContent.findIndex(item=>item._index===s._index);
  dialogTitle.textContent=s.content;
- dialogSubtitle.textContent=dateText(s.date)+' · '+(s.label||`${idx+1}회차`);
+ dialogSubtitle.textContent=dateText(s.date)+' · '+(s.label||`${Number.isSafeInteger(s.round)&&s.round>0?s.round:idx+1}회차`);
  roundNav.replaceChildren();
  const prev=mk('button','','‹ 이전 회차');prev.type='button';prev.disabled=idx<=0;
- const current=mk('span','',`${idx+1}회차 / 총 ${ofContent.length}회차`);
+ const current=mk('span','',`${Number.isSafeInteger(s.round)&&s.round>0?s.round:idx+1}회차 / 총 ${ofContent.length}회차`);
  const next=mk('button','','다음 회차 ›');next.type='button';next.disabled=idx>=ofContent.length-1;
  prev.addEventListener('click',()=>{activeSession=ofContent[idx-1];activeFilter='all';renderDetail()});
  next.addEventListener('click',()=>{activeSession=ofContent[idx+1];activeFilter='all';renderDetail()});
