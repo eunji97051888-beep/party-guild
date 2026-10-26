@@ -149,31 +149,31 @@ window.PARTY_WEEKLY_BOARD = {
       "kind": "battle",
       "placements": {
         "0": {
-          "row": 7,
+          "row": 8,
           "span": 1
         },
         "1": {
-          "row": 7,
+          "row": 8,
           "span": 1
         },
         "2": {
-          "row": 7,
+          "row": 8,
           "span": 1
         },
         "3": {
-          "row": 7,
+          "row": 8,
           "span": 1
         },
         "4": {
-          "row": 7,
+          "row": 8,
           "span": 1
         },
         "5": {
-          "row": 7,
+          "row": 8,
           "span": 1
         },
         "6": {
-          "row": 7,
+          "row": 8,
           "span": 1
         }
       }
