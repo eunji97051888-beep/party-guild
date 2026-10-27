@@ -1,0 +1,23 @@
+/* 파티 문파 : 설문 바로가기 (GitHub Pages 정적 동작) */
+.survey-quick { margin: 0 0 27px; padding: 22px 25px 25px; border-radius: 17px; background: linear-gradient(120deg, #1d2d50 0%, #172440 72%); border: 1px solid rgba(234,196,139,.52); box-shadow: 0 10px 35px #03071466; scroll-margin-top:20px; }
+.survey-quick-head { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px; }
+.survey-kicker { font-size:10px; font-weight:800; letter-spacing:.16em; color:#e9bf83; }
+.survey-quick-head h2 { font:800 clamp(21px,2vw,27px)/1.4 'Noto Serif KR',serif; margin:5px 0 5px; color:#fff2d9; }
+.survey-quick-head p { color:#bac8e1; font-size:12px; line-height:1.7; margin:0; }
+.survey-quick-label { flex-shrink:0; border:1px solid #e2c38a7d; color:#f3d09b; font-size:11px; padding:7px 10px; border-radius:999px; }
+.survey-quick-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.survey-quick-card { display:flex; align-items:center; gap:17px; min-width:0; min-height:145px; padding:20px; border-radius:14px; border:1px solid #e9c68c88; background:linear-gradient(120deg,#4a3851,#282e51); color:#fff; box-shadow: 0 5px 16px #0207132b; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+.survey-quick-card:hover:not([aria-disabled="true"]),.survey-quick-card:focus-visible:not([aria-disabled="true"]) { transform:translateY(-2px); border-color:#ffdd9b; box-shadow:0 8px 24px #0006; }
+.survey-quick-attendance { background:linear-gradient(120deg,#1c4a5a,#263657); border-color:#7fcdd5a0; }
+.survey-quick-icon { display:grid; place-items:center; flex:0 0 54px; height:54px; border-radius:14px; background:#ffffff18; border:1px solid #ffffff24; font-size:27px; }
+.survey-quick-copy { display:flex; flex-direction:column; align-items:flex-start; min-width:0; gap:6px; }
+.survey-quick-eyebrow { font-size:10px; font-weight:800; color:#f4ce96; }
+.survey-quick-attendance .survey-quick-eyebrow { color:#a9ecdf; }
+.survey-quick-copy strong { font:800 clamp(19px,1.5vw,25px)/1.35 'Noto Serif KR',serif; color:white; }
+.survey-quick-copy small { font-size:12px; color:#d8e0f2; line-height:1.55; }
+.survey-quick-status { font-size:11px; color:#f0d3a6; font-weight:700; margin-top:3px; }
+.survey-quick-attendance .survey-quick-status { color:#bdeee8; }
+.survey-quick-arrow { margin-left:auto; align-self:center; padding:10px; border-radius:50%; background:#ffffff1a; font-size:24px; color:#fff4d4; }
+.survey-quick-card[aria-disabled="true"] { cursor:not-allowed; opacity:.75; }
+@media(max-width:760px){.survey-quick { padding:16px; margin-bottom:18px; } .survey-quick-head { margin-bottom:13px; align-items:flex-start; } .survey-quick-label { display:none; } .survey-quick-grid { grid-template-columns:1fr; gap:10px; } .survey-quick-card { min-height:110px; padding:15px 13px; gap:12px; } .survey-quick-icon { flex-basis:46px; height:46px; font-size:24px; }.survey-quick-copy strong { font-size:19px; }.survey-quick-arrow { font-size:19px; padding:6px; } }
+@media(prefers-reduced-motion:reduce){ .survey-quick-card { transition:none; } }
