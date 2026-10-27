@@ -8,16 +8,35 @@
  const noticeRoot=$('noticeItems');
  const sortedNotices=notices.slice().sort((a,b)=>Number(Boolean(b.pinned))-Number(Boolean(a.pinned))||(b.date||'').localeCompare(a.date||''));
  $('noticeCount').textContent=sortedNotices.length+'개 공지';
- if(!sortedNotices.length){const empty=document.createElement('p');empty.className='notice-empty';empty.textContent='등록된 공지사항이 아직 없어요.';noticeRoot.append(empty)}
- for(const n of sortedNotices){
-  const item=document.createElement('article');item.className='notice-entry';
-  const heading=document.createElement('div');heading.className='notice-entry-heading';
-  if(n.pinned){const mark=document.createElement('span');mark.className='notice-pin';mark.textContent='중요';heading.append(mark)}
-  const title=document.createElement('h4');title.textContent=n.title||'';heading.append(title);
-  if(n.date){const date=document.createElement('time');date.textContent=n.date;date.dateTime=n.date;heading.append(date)}
-  const contents=document.createElement('p');contents.textContent=n.body||'';
-  item.append(heading,contents);noticeRoot.append(item);
+ const publicPageSize=5;
+ let publicPage=0;
+ const noticePager=document.createElement('nav');noticePager.className='notice-public-pager';noticePager.setAttribute('aria-label','문파 공지사항 페이지');
+ const noticePrev=document.createElement('button');noticePrev.type='button';noticePrev.textContent='‹ 이전';
+ const noticeStatus=document.createElement('span');noticeStatus.setAttribute('aria-live','polite');
+ const noticeNext=document.createElement('button');noticeNext.type='button';noticeNext.textContent='다음 ›';
+ noticePager.append(noticePrev,noticeStatus,noticeNext);noticeRoot.after(noticePager);
+ function renderNotices(){
+   noticeRoot.replaceChildren();
+   const pageCount=Math.max(1,Math.ceil(sortedNotices.length/publicPageSize));
+   publicPage=Math.min(Math.max(0,publicPage),pageCount-1);
+   if(!sortedNotices.length){const empty=document.createElement('p');empty.className='notice-empty';empty.textContent='등록된 공지사항이 아직 없어요.';noticeRoot.append(empty)}
+   for(const n of sortedNotices.slice(publicPage*publicPageSize,(publicPage+1)*publicPageSize)){
+     const item=document.createElement('article');item.className='notice-entry';
+     const heading=document.createElement('div');heading.className='notice-entry-heading';
+     if(n.pinned){const mark=document.createElement('span');mark.className='notice-pin';mark.textContent='중요';heading.append(mark)}
+     const title=document.createElement('h4');title.textContent=n.title||'';heading.append(title);
+     if(n.date){const date=document.createElement('time');date.textContent=n.date;date.dateTime=n.date;heading.append(date)}
+     const contents=document.createElement('p');contents.textContent=n.body||'';
+     item.append(heading,contents);noticeRoot.append(item);
+   }
+   noticePager.hidden=sortedNotices.length<=publicPageSize;
+   noticeStatus.textContent=`${publicPage+1} / ${pageCount} 페이지`;
+   noticePrev.disabled=publicPage===0;
+   noticeNext.disabled=publicPage>=pageCount-1;
  }
+ noticePrev.addEventListener('click',()=>{publicPage--;renderNotices();noticePager.scrollIntoView({behavior:'smooth',block:'nearest'})});
+ noticeNext.addEventListener('click',()=>{publicPage++;renderNotices();noticePager.scrollIntoView({behavior:'smooth',block:'nearest'})});
+ renderNotices();
  $('note').textContent=data.note||'';const plannerImage=data.image||'weekly.png';$('weeklyImage').src=plannerImage+(plannerImage.includes('?')?'&':'?')+'v='+Date.now();
  function render(){let days=$('days');days.replaceChildren();names.forEach((name,i)=>{const btn=document.createElement('button');btn.className='day'+(i===selected?' active':'');btn.type='button';btn.textContent=name;btn.setAttribute('aria-pressed',String(i===selected));btn.onclick=()=>{selected=i;render()};days.append(btn)});$('selday').textContent=names[selected]+'요일 일정';const matches=activeEvents.filter(e=>Array.isArray(e.days)&&e.days.includes(selected)).sort((a,b)=>a.time.localeCompare(b.time));$('eventCount').textContent=`${matches.length}개 콘텐츠`;let el=$('events');el.replaceChildren();if(!matches.length){let d=document.createElement('div');d.className='empty';d.textContent='등록된 정기 일정이 없어요.';el.append(d)}matches.forEach(e=>{let card=document.createElement('div');card.className='event';let ico=document.createElement('span');ico.className='event-mark';ico.textContent=e.type?.includes('보스')?'⚔':'✦';let time=document.createElement('span');time.className='event-time';time.textContent=e.time;let text=document.createElement('div');text.className='event-content';let title=document.createElement('b');title.textContent=e.name;let type=document.createElement('small');type.textContent=e.type;text.append(title,type);card.append(ico,time,text);el.append(card)})}render();window.PARTY_SET_SCHEDULE=events=>{if(Array.isArray(events)){activeEvents=events;render();}};
  const overlay=$('lightbox');function close(){overlay.hidden=true;document.body.style.overflow=''}$('openImage').onclick=()=>{$('lightImg').src=$('weeklyImage').src;overlay.hidden=false;document.body.style.overflow='hidden'};$('closeImage').onclick=close;overlay.onclick=e=>{if(e.target===overlay)close()};document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});

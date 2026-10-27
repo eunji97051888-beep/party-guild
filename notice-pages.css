@@ -1,0 +1,23 @@
+/* 파티 문파 공지사항 편집기의 5개 단위 페이지와 접기/펼치기 */
+.notice-pager-tools{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin:14px 0 5px}
+.notice-search{flex:1 1 220px;min-width:0;max-width:460px;width:100%;padding:11px 12px;background:#0e1a2c;border:1px solid #96764f;border-radius:8px;color:#f5e7cd;font-size:14px}
+.notice-search:focus{outline:2px solid #e1bd7c;outline-offset:2px}
+.notice-pager-count{font-size:12px;color:#d6bd90}
+.notice-page-hidden{display:none!important}
+.notice-collapse-card{padding:9px 13px!important}
+.notice-collapse-card>.field,.notice-collapse-card>.notice-edit-options{display:none!important}
+.notice-toggle{background:transparent;border:0;cursor:pointer;text-align:left;color:#f5d7a5;font:inherit;font-weight:800;max-width:100%;overflow-wrap:anywhere;line-height:1.5;padding:7px 3px}
+.notice-toggle:hover{text-decoration:underline}
+.notice-toggle:focus-visible{outline:2px solid #e1bd7c;outline-offset:3px;border-radius:3px}
+.notice-edit-head{gap:12px}
+.notice-edit-head .notice-delete{flex-shrink:0}
+.notice-pager-bar{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:13px;padding:13px;border:1px solid #685641;background:#182537;border-radius:9px;margin:12px 0 15px}
+.notice-pager-bar .action{padding:8px 14px;font-size:13px}
+.notice-pager-info{color:#e9d2aa;font-size:13px;text-align:center}
+.notice-empty-list{color:#c6bda7;padding:18px;text-align:center;border:1px dashed #786343;border-radius:8px}
+.notice-public-pager{display:flex;align-items:center;justify-content:center;gap:13px;flex-wrap:wrap;margin-top:18px}
+.notice-public-pager[hidden]{display:none!important}
+.notice-public-pager button{border:1px solid #93764e;border-radius:8px;background:#202d3f;color:#ffdfaa;cursor:pointer;font-weight:700;min-height:37px;padding:8px 13px}
+.notice-public-pager button:disabled{opacity:.45;cursor:default}
+.notice-public-pager span{font-size:13px;color:#dfc595}
+@media(max-width:480px){.notice-pager-tools{align-items:stretch}.notice-search{max-width:none}.notice-toggle{font-size:13px}.notice-pager-bar{gap:7px}.notice-pager-info{font-size:12px}}
