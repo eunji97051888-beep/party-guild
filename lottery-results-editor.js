@@ -11,19 +11,20 @@ function validate(data){
  const total=participants.reduce((s,[,c])=>s+c,0);
  if(total!==data.total_tickets)throw Error('총 추첨권이 참가자 기록과 일치하지 않아.');
  return {started_at_kst:safe(data.started_at_kst),participant_count:participants.length,total_tickets:total,
+ settlement_period:safe(data.settlement_period),attendance_range:(data.attendance_range&&typeof data.attendance_range==='object'?{start:safe(data.attendance_range.start),end:safe(data.attendance_range.end)}:null),
  winners:data.winners.map(w=>({round:w.round,name:w.name,confirmed_at_kst:safe(w.confirmed_at_kst)}))};
 }
 function render(){
  const el=$('items');el.replaceChildren();
  if(!items.length){el.textContent='아직 등록한 결과가 없어.';return}
  items.forEach((item,i)=>{const row=document.createElement('div');row.className='row';row.style.marginBottom='12px';
- const desc=document.createElement('div');desc.textContent=`${item.reward_name} · ${item.started_at_kst} · ${item.winners.length}명`;
+ const desc=document.createElement('div');desc.textContent=`${item.settlement_period?item.settlement_period+" 정산 · ":""}${item.reward_name} · ${item.started_at_kst} · ${item.winners.length}명`;
  const del=document.createElement('button');del.className='danger';del.textContent='삭제';del.onclick=()=>{if(confirm('이 결과를 게시 목록에서 삭제할까?')){items.splice(i,1);render()}};
  row.append(desc,del);el.append(row)})
 }
 $('file').addEventListener('change',async e=>{
  incoming=null;try{const file=e.target.files[0];if(!file)return;incoming=validate(JSON.parse(await file.text()));
- $('preview').textContent=`추첨 시작 ${incoming.started_at_kst} · 참여 ${incoming.participant_count}명 · 추첨권 ${incoming.total_tickets}장 · 당첨 ${incoming.winners.length}명`;
+ $('preview').textContent=`정산 ${incoming.settlement_period||"미지정"} · 집계 ${incoming.attendance_range?.start||"?"} ~ ${incoming.attendance_range?.end||"?"} · 추첨 시작 ${incoming.started_at_kst} · 참여 ${incoming.participant_count}명 · 추첨권 ${incoming.total_tickets}장 · 당첨 ${incoming.winners.length}명`;
  }catch(err){$('preview').textContent='파일 확인 실패: '+err.message;}
 });
 $('add').onclick=()=>{

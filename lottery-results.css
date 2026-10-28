@@ -51,3 +51,10 @@ button.secondary{background:#334c6a;color:#e6efff}button.danger{background:#703d
 .coin-member-completed .coin-balance{color:#b8c4d6;font-size:20px}
 .coin-member-completed .coin-status{color:#b8c4d6}
 @media(max-width:650px){.coin-completed summary{padding:13px 12px}.coin-completed > .coin-members{padding:0 9px 9px}}
+
+/* v3.16: archived monthly draw records; carryover balances are cumulative. */
+.result-month-panel{background:#24314a;border:1px solid #536381;border-radius:14px;padding:17px 20px;margin:0 0 16px}
+.result-month-panel label{font-weight:800;color:#f1c673;margin:0 0 9px}
+.result-month-panel select{width:100%;max-width:320px;background:#1b2b45;color:#fff;border:1px solid #657893;border-radius:8px;padding:10px 12px}
+.result-month-panel .muted{margin:9px 0 0;font-size:13px}
+@media(max-width:550px){.result-month-panel{padding:14px}}
