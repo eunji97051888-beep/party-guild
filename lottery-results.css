@@ -35,3 +35,19 @@ button.secondary{background:#334c6a;color:#e6efff}button.danger{background:#703d
 .coin-status{font-size:12px;color:#9bdac1;margin-top:5px}
 .coin-caution{font-size:12px;color:#9baec9;line-height:1.7;margin-top:14px}
 @media(max-width:650px){.coin-members{grid-template-columns:1fr}.coin-panel{padding:16px}.coin-balance{font-size:23px}}
+/* v3.15: active carryovers shown first; paid-out records kept in a collapsed section. */
+.coin-group-title{font-size:16px;color:#f0d3a2;margin:2px 0 12px;font-weight:800}
+.coin-empty{margin:0 0 14px}
+.coin-completed{margin-top:16px;border:1px solid #435a7b;background:#1d2b42;border-radius:12px;overflow:hidden}
+.coin-completed summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;color:#e4ebf7;font-size:14px}
+.coin-completed summary::-webkit-details-marker{display:none}
+.coin-completed summary:hover{background:#2c3d58}
+.coin-completed summary:focus-visible{outline:2px solid #f6cb80;outline-offset:-2px}
+.coin-completed-toggle{color:#f6cb80;font-weight:800;white-space:nowrap}
+.coin-toggle-close{display:none}
+.coin-completed[open] .coin-toggle-open{display:none}
+.coin-completed[open] .coin-toggle-close{display:inline}
+.coin-completed > .coin-members{padding:0 12px 12px}
+.coin-member-completed .coin-balance{color:#b8c4d6;font-size:20px}
+.coin-member-completed .coin-status{color:#b8c4d6}
+@media(max-width:650px){.coin-completed summary{padding:13px 12px}.coin-completed > .coin-members{padding:0 9px 9px}}
