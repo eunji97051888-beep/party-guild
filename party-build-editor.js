@@ -1,5 +1,42 @@
 /* 파티 문파 | 도술빌드 작성 / JS 게시 v1 */
 (()=>{'use strict';
+const guildSave=window.PARTY_GUILD_OVERWRITE_SAVE||(window.PARTY_GUILD_OVERWRITE_SAVE=(()=>{
+  const handles=new Map();
+  return async function saveNamedFile(filename,source,mime='text/javascript'){
+    const blobFactory=typeof source==='function'?source:()=>source;
+    if(typeof window.showSaveFilePicker==='function'){
+      let handle=handles.get(filename);
+      if(!handle){
+        const ext='.'+filename.split('.').pop().toLowerCase();
+        handle=await window.showSaveFilePicker({
+          suggestedName:filename,
+          types:[{description:'파티 문파 게시 파일',accept:{[mime]:[ext]}}]
+        });
+        // Exact file names matter because GitHub Pages loads fixed paths.
+        if(handle.name!==filename)throw new Error('파일 이름을 '+filename+'(으)로 저장해 줘.');
+        handles.set(filename,handle);
+      }
+      try{
+        const blob=await blobFactory();
+        const writer=await handle.createWritable();
+        try{await writer.write(blob);await writer.close()}
+        catch(err){try{await writer.abort()}catch{}throw err}
+        return 'saved';
+      }catch(err){handles.delete(filename);throw err}
+    }
+    // Non-Chromium fallback: preserve the old download behavior.
+    const blob=await blobFactory();
+    const url=URL.createObjectURL(blob);
+    try{const a=document.createElement('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove()}
+    finally{setTimeout(()=>URL.revokeObjectURL(url),10000)}
+    return 'downloaded';
+  }
+})());
+const guildSaveNotice=(result,filename)=>result==='saved'
+ ? filename+' 저장 완료! 같은 탭에서 다시 저장하면 기존 파일에 덮어써. GitHub에 올려 Commit changes를 눌러줘.'
+ : filename+' 다운로드 완료. 이 브라우저에서는 덮어쓰기가 지원되지 않아 파일명 중복이 생길 수 있어. GitHub에 업로드해 줘.';
+const guildSaveError=err=>err?.name==='AbortError'?null:(err?.message||String(err));
+
  const $=id=>document.getElementById(id),deep=a=>JSON.parse(JSON.stringify(a));
  let posts=deep(Array.isArray(window.PARTY_VERIFIED_BUILDS)?window.PARTY_VERIFIED_BUILDS:[]),selected=-1,image='';
  const date=()=>{const t=new Date();return [t.getFullYear(),String(t.getMonth()+1).padStart(2,'0'),String(t.getDate()).padStart(2,'0')].join('-')};
@@ -15,6 +52,6 @@
  $('removeImage').onclick=()=>{image='';$('image').value='';showPreview();status('사진을 지웠어요. ‘이 글 저장’으로 반영해 주세요.')};
  $('savePost').onclick=()=>{const title=$('title').value.trim(),d=$('date').value,body=$('body').value.trim();if(!title||!d){alert('제목과 날짜를 입력해 주세요.');return}const old=selected<0?null:posts[selected];const p={id:old?.id||String(Date.now()),title,date:d,image,body};if(selected<0){posts.unshift(p);selected=0}else posts[selected]=p;renderList();status('글 저장 완료! 맨 아래에서 JS 파일을 다운로드해야 실제 게시할 수 있어요.')};
  $('deletePost').onclick=()=>{if(selected<0)return;if(!confirm('이 도술빌드 게시글을 삭제할까요?'))return;posts.splice(selected,1);clearForm()};
- $('export').onclick=()=>{const txt='window.PARTY_VERIFIED_BUILDS = '+JSON.stringify(posts,null,2).replace(/</g,'\\u003c')+';\n';const blob=new Blob([txt],{type:'text/javascript;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='party-build-data.js';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);status('파일을 다운로드했어요. GitHub의 party-build-data.js를 교체하고 Commit changes를 눌러 주세요.')};
+ $('export').onclick=async()=>{const txt='window.PARTY_VERIFIED_BUILDS = '+JSON.stringify(posts,null,2).replace(/</g,'\\u003c')+';\n';try{const result=await guildSave('party-build-data.js',new Blob([txt],{type:'text/javascript;charset=utf-8'}));status(guildSaveNotice(result,'party-build-data.js'))}catch(e){const error=guildSaveError(e);if(error)status('저장 실패: '+error)}};
  clearForm();
 })();

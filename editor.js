@@ -1,4 +1,41 @@
-(() => {'use strict';const $=id=>document.getElementById(id),days=['일','월','화','수','목','금','토'];const original=JSON.parse(JSON.stringify(window.PARTY_DEFAULT));const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));let currentPreview=null;
+(() => {'use strict';
+const guildSave=window.PARTY_GUILD_OVERWRITE_SAVE||(window.PARTY_GUILD_OVERWRITE_SAVE=(()=>{
+  const handles=new Map();
+  return async function saveNamedFile(filename,source,mime='text/javascript'){
+    const blobFactory=typeof source==='function'?source:()=>source;
+    if(typeof window.showSaveFilePicker==='function'){
+      let handle=handles.get(filename);
+      if(!handle){
+        const ext='.'+filename.split('.').pop().toLowerCase();
+        handle=await window.showSaveFilePicker({
+          suggestedName:filename,
+          types:[{description:'파티 문파 게시 파일',accept:{[mime]:[ext]}}]
+        });
+        // Exact file names matter because GitHub Pages loads fixed paths.
+        if(handle.name!==filename)throw new Error('파일 이름을 '+filename+'(으)로 저장해 줘.');
+        handles.set(filename,handle);
+      }
+      try{
+        const blob=await blobFactory();
+        const writer=await handle.createWritable();
+        try{await writer.write(blob);await writer.close()}
+        catch(err){try{await writer.abort()}catch{}throw err}
+        return 'saved';
+      }catch(err){handles.delete(filename);throw err}
+    }
+    // Non-Chromium fallback: preserve the old download behavior.
+    const blob=await blobFactory();
+    const url=URL.createObjectURL(blob);
+    try{const a=document.createElement('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove()}
+    finally{setTimeout(()=>URL.revokeObjectURL(url),10000)}
+    return 'downloaded';
+  }
+})());
+const guildSaveNotice=(result,filename)=>result==='saved'
+ ? filename+' 저장 완료! 같은 탭에서 다시 저장하면 기존 파일에 덮어써. GitHub에 올려 Commit changes를 눌러줘.'
+ : filename+' 다운로드 완료. 이 브라우저에서는 덮어쓰기가 지원되지 않아 파일명 중복이 생길 수 있어. GitHub에 업로드해 줘.';
+const guildSaveError=err=>err?.name==='AbortError'?null:(err?.message||String(err));
+const $=id=>document.getElementById(id),days=['일','월','화','수','목','금','토'];const original=JSON.parse(JSON.stringify(window.PARTY_DEFAULT));const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));let currentPreview=null;
  function row(e={days:[1],time:'20:00',name:'',type:'문파 콘텐츠'}){let el=document.createElement('div');el.className='row-edit';el.innerHTML=`<input type="time" class="time" aria-label="시간" value="${escape(e.time)}"><input class="name" aria-label="콘텐츠 이름" placeholder="콘텐츠 이름" value="${escape(e.name)}"><input class="kind" aria-label="종류" placeholder="종류" value="${escape(e.type)}"><button type="button" class="action danger delete">삭제</button><div class="week-check">${days.map((d,i)=>`<label><input type="checkbox" value="${i}" ${e.days?.includes(i)?'checked':''}> ${d}요일</label>`).join('')}</div>`;el.querySelector('.delete').onclick=()=>el.remove();$('rows').append(el)}
 
  function noticeRow(n={title:'',body:'',date:'',pinned:false}){
@@ -50,7 +87,7 @@
  const videos=enteredVideos.map(x=>({title:x.title,id:youtubeId(x.url)}));
  const data={...original,quoteTitle,quoteSubtitle,note:$('note').value.trim(),image:original.image||'weekly.png',notices,events,resources,videos};const js='window.PARTY_DEFAULT = '+JSON.stringify(data,null,2)+';\n';return new Blob([js],{type:'text/javascript;charset=utf-8'});}catch(err){console.error(err);report('저장 중 오류: '+(err?.message||String(err)))} }
 
- $('exportData').onclick=()=>{const blob=generateDataBlob();if(blob){download('data.js',blob);$('status').textContent='data.js 다운로드를 요청했어. GitHub에 올려줘.'}};
+ $('exportData').onclick=async()=>{const blob=generateDataBlob();if(!blob)return;try{const result=await guildSave('data.js',blob);$('status').textContent=guildSaveNotice(result,'data.js')}catch(e){const msg=guildSaveError(e);if(msg)report('data.js 저장 실패: '+msg)}};
 
  // Small self-contained ZIP writer (STORE method). No CDN or paid service required.
  const encoder=new TextEncoder();
@@ -73,16 +110,19 @@
  $('exportBundle').onclick=async()=>{
    const button=$('exportBundle');const data=generateDataBlob();if(!data)return;
    try{button.disabled=true;button.textContent='ZIP 생성 중...';
-      const entries=[['data.js',new Uint8Array(await data.arrayBuffer())]];
       const file=$('imageFile').files?.[0];
-      if(file){if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>15*1024*1024)throw new Error('주간 플래너는 15MB 이하 PNG/JPG/WEBP만 가능해.');
-         const image=await pngFromImage(file);entries.push(['weekly.png',new Uint8Array(await image.arrayBuffer())]);}
-      download('party-updates.zip',packZip(entries));
-      $('status').textContent='ZIP 다운로드를 요청했어! 압축을 풀고 '+entries.map(e=>e[0]).join(', ')+' 파일을 GitHub에 업로드해 줘.';
+      if(file&&!['image/png','image/jpeg','image/webp'].includes(file.type))throw new Error('지원하지 않는 이미지야.');
+      const result=await guildSave('party-updates.zip',async()=>{
+        const entries=[['data.js',new Uint8Array(await data.arrayBuffer())]];
+        if(file){if(file.size>15*1024*1024)throw new Error('주간 플래너는 15MB 이하 이미지로 선택해 줘.');
+          const image=await pngFromImage(file);entries.push(['weekly.png',new Uint8Array(await image.arrayBuffer())]);}
+        return packZip(entries);
+      },'application/zip');
+      $('status').textContent=guildSaveNotice(result,'party-updates.zip')+' ZIP을 풀어 내부 파일을 GitHub에 올려줘.';
       $('status').style.color='#bfe2bd';
-   }catch(e){console.error(e);report('ZIP 생성 오류: '+(e.message||String(e)))}
+   }catch(e){const msg=guildSaveError(e);if(msg){console.error(e);report('ZIP 저장 오류: '+msg)}}
    finally{button.disabled=false;button.textContent='변경 파일 한 번에 ZIP 다운로드'}
  };
  $('imageFile').onchange=()=>{let f=$('imageFile').files?.[0];if(currentPreview)URL.revokeObjectURL(currentPreview);if(!f){$('exportImage').disabled=true;return}if(!['image/png','image/jpeg','image/webp'].includes(f.type)||f.size>15*1024*1024){alert('15MB 이하 PNG/JPG/WEBP 이미지로 선택해 줘.');$('imageFile').value='';return}currentPreview=URL.createObjectURL(f);$('preview').src=currentPreview;$('exportImage').disabled=false};
- $('exportImage').onclick=async()=>{try{const f=$('imageFile').files?.[0];if(!f)return;const bitmap=await createImageBitmap(f);const canvas=document.createElement('canvas');canvas.width=bitmap.width;canvas.height=bitmap.height;const ctx=canvas.getContext('2d');ctx.drawImage(bitmap,0,0);bitmap.close();canvas.toBlob(blob=>{if(!blob){alert('이미지 변환에 실패했어.');return}download('weekly.png',blob);$('status').textContent='weekly.png 다운로드 완료! GitHub에 업로드해 줘.'},'image/png')}catch(e){alert('이미지 처리 실패: '+e.message)}};
+ $('exportImage').onclick=async()=>{try{const f=$('imageFile').files?.[0];if(!f)return;const result=await guildSave('weekly.png',async()=>{const bitmap=await createImageBitmap(f);const canvas=document.createElement('canvas');canvas.width=bitmap.width;canvas.height=bitmap.height;canvas.getContext('2d').drawImage(bitmap,0,0);bitmap.close();return await new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(Error('이미지 변환 실패')),'image/png'))},'image/png');$('status').textContent=guildSaveNotice(result,'weekly.png')}catch(e){const msg=guildSaveError(e);if(msg)alert('이미지 저장 실패: '+msg)}};
 })();

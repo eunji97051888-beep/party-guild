@@ -1,4 +1,41 @@
 (()=>{'use strict';
+const guildSave=window.PARTY_GUILD_OVERWRITE_SAVE||(window.PARTY_GUILD_OVERWRITE_SAVE=(()=>{
+  const handles=new Map();
+  return async function saveNamedFile(filename,source,mime='text/javascript'){
+    const blobFactory=typeof source==='function'?source:()=>source;
+    if(typeof window.showSaveFilePicker==='function'){
+      let handle=handles.get(filename);
+      if(!handle){
+        const ext='.'+filename.split('.').pop().toLowerCase();
+        handle=await window.showSaveFilePicker({
+          suggestedName:filename,
+          types:[{description:'파티 문파 게시 파일',accept:{[mime]:[ext]}}]
+        });
+        // Exact file names matter because GitHub Pages loads fixed paths.
+        if(handle.name!==filename)throw new Error('파일 이름을 '+filename+'(으)로 저장해 줘.');
+        handles.set(filename,handle);
+      }
+      try{
+        const blob=await blobFactory();
+        const writer=await handle.createWritable();
+        try{await writer.write(blob);await writer.close()}
+        catch(err){try{await writer.abort()}catch{}throw err}
+        return 'saved';
+      }catch(err){handles.delete(filename);throw err}
+    }
+    // Non-Chromium fallback: preserve the old download behavior.
+    const blob=await blobFactory();
+    const url=URL.createObjectURL(blob);
+    try{const a=document.createElement('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove()}
+    finally{setTimeout(()=>URL.revokeObjectURL(url),10000)}
+    return 'downloaded';
+  }
+})());
+const guildSaveNotice=(result,filename)=>result==='saved'
+ ? filename+' 저장 완료! 같은 탭에서 다시 저장하면 기존 파일에 덮어써. GitHub에 올려 Commit changes를 눌러줘.'
+ : filename+' 다운로드 완료. 이 브라우저에서는 덮어쓰기가 지원되지 않아 파일명 중복이 생길 수 있어. GitHub에 업로드해 줘.';
+const guildSaveError=err=>err?.name==='AbortError'?null:(err?.message||String(err));
+
 let items=Array.isArray(window.PARTY_LOTTERY_RESULTS)?structuredClone(window.PARTY_LOTTERY_RESULTS):[];
 let incoming=null;const $=id=>document.getElementById(id);
 function safe(v){return typeof v==='string'?v:''}
@@ -36,11 +73,10 @@ $('add').onclick=()=>{
  if(!confirm(`보상: ${name}\n당첨자: ${next.winners.map(w=>w.name).join(', ')}\n\n이 결과를 게시 목록에 추가할까?`))return;
  items.unshift(next);incoming=null;$('file').value='';$('reward').value='';$('postTitle').value='';$('preview').textContent='결과를 추가했어.';render();
 };
-$('download').onclick=()=>{
+$('download').onclick=async()=>{
  const json=JSON.stringify(items).replace(/</g,'\\u003c').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029');
  const blob=new Blob(['window.PARTY_LOTTERY_RESULTS = '+json+';\n'],{type:'text/javascript;charset=utf-8'});
- const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='lottery-results-data.js';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);
- $('status').textContent='다운로드 완료. 이제 GitHub 저장소 최상위에 lottery-results-data.js 파일을 업로드하고 Commit changes를 눌러야 홈페이지에 공개돼.';
+ try{const result=await guildSave('lottery-results-data.js',blob);$('status').textContent=guildSaveNotice(result,'lottery-results-data.js')}catch(e){const error=guildSaveError(e);if(error)$('status').textContent='저장 실패: '+error}
 };
 render();
 })();

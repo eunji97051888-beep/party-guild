@@ -1,4 +1,41 @@
 (function(){'use strict';
+const guildSave=window.PARTY_GUILD_OVERWRITE_SAVE||(window.PARTY_GUILD_OVERWRITE_SAVE=(()=>{
+  const handles=new Map();
+  return async function saveNamedFile(filename,source,mime='text/javascript'){
+    const blobFactory=typeof source==='function'?source:()=>source;
+    if(typeof window.showSaveFilePicker==='function'){
+      let handle=handles.get(filename);
+      if(!handle){
+        const ext='.'+filename.split('.').pop().toLowerCase();
+        handle=await window.showSaveFilePicker({
+          suggestedName:filename,
+          types:[{description:'파티 문파 게시 파일',accept:{[mime]:[ext]}}]
+        });
+        // Exact file names matter because GitHub Pages loads fixed paths.
+        if(handle.name!==filename)throw new Error('파일 이름을 '+filename+'(으)로 저장해 줘.');
+        handles.set(filename,handle);
+      }
+      try{
+        const blob=await blobFactory();
+        const writer=await handle.createWritable();
+        try{await writer.write(blob);await writer.close()}
+        catch(err){try{await writer.abort()}catch{}throw err}
+        return 'saved';
+      }catch(err){handles.delete(filename);throw err}
+    }
+    // Non-Chromium fallback: preserve the old download behavior.
+    const blob=await blobFactory();
+    const url=URL.createObjectURL(blob);
+    try{const a=document.createElement('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove()}
+    finally{setTimeout(()=>URL.revokeObjectURL(url),10000)}
+    return 'downloaded';
+  }
+})());
+const guildSaveNotice=(result,filename)=>result==='saved'
+ ? filename+' 저장 완료! 같은 탭에서 다시 저장하면 기존 파일에 덮어써. GitHub에 올려 Commit changes를 눌러줘.'
+ : filename+' 다운로드 완료. 이 브라우저에서는 덮어쓰기가 지원되지 않아 파일명 중복이 생길 수 있어. GitHub에 업로드해 줘.';
+const guildSaveError=err=>err?.name==='AbortError'?null:(err?.message||String(err));
+
 const list=document.getElementById('yechiEditList'), title=document.getElementById('yechiNewTitle'), file=document.getElementById('yechiNewImage'), status=document.getElementById('yechiImageStatus');
 if(!list||!title||!file||!status)return;
 let reports=Array.isArray(window.YECHI_REPORTS)?window.YECHI_REPORTS.map(x=>({...x})):[];
@@ -84,9 +121,8 @@ async function convert(source){if(!/^image\/(jpeg|png|webp)$/.test(source.type))
 const url=URL.createObjectURL(source);try{const img=new Image();await new Promise((ok,no)=>{img.onload=ok;img.onerror=no;img.src=url});
 const factor=Math.min(1,1200/img.naturalWidth,2000/img.naturalHeight),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.naturalWidth*factor));canvas.height=Math.max(1,Math.round(img.naturalHeight*factor));const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);return canvas.toDataURL('image/jpeg',.78)}finally{URL.revokeObjectURL(url)}}
 document.getElementById('yechiAddReport').onclick=async()=>{const t=title.value.trim(),f=file.files[0];if(!t||!f){say('제목과 사진을 모두 입력해 줘.');return}say('사진 최적화 중…');try{const image=await convert(f);reports.unshift({title:t,image});title.value='';file.value='';page=0;form.open=false;render();say('보고서를 추가했어. 전체 목록을 확인한 다음 게시 파일을 다운로드해 줘.')}catch(e){say(e.message||'이미지 처리를 실패했어.')}};
-document.getElementById('yechiDownloadData').onclick=()=>{if(reports.some(r=>!r.title.trim())){say('제목이 비어 있는 보고서를 확인해 줘.');return}
+document.getElementById('yechiDownloadData').onclick=async()=>{if(reports.some(r=>!r.title.trim())){say('제목이 비어 있는 보고서를 확인해 줘.');return}
 const data='/* Public report archive */\nwindow.YECHI_REPORTS = '+JSON.stringify(reports)+';\n';
-const blob=new Blob([data],{type:'text/javascript;charset=utf-8'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='yechi-report-data.js';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);
-say('다운로드 완료! yechi-report-data.js 하나를 GitHub 저장소 최상위에 올려 Commit changes를 눌러줘.');};
+try{const result=await guildSave('yechi-report-data.js',new Blob([data],{type:'text/javascript;charset=utf-8'}));say(guildSaveNotice(result,'yechi-report-data.js'))}catch(e){const error=guildSaveError(e);if(error)say('저장 실패: '+error)}};
 render();
 })();

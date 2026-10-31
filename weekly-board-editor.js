@@ -1,4 +1,41 @@
 (()=>{'use strict';
+const guildSave=window.PARTY_GUILD_OVERWRITE_SAVE||(window.PARTY_GUILD_OVERWRITE_SAVE=(()=>{
+  const handles=new Map();
+  return async function saveNamedFile(filename,source,mime='text/javascript'){
+    const blobFactory=typeof source==='function'?source:()=>source;
+    if(typeof window.showSaveFilePicker==='function'){
+      let handle=handles.get(filename);
+      if(!handle){
+        const ext='.'+filename.split('.').pop().toLowerCase();
+        handle=await window.showSaveFilePicker({
+          suggestedName:filename,
+          types:[{description:'파티 문파 게시 파일',accept:{[mime]:[ext]}}]
+        });
+        // Exact file names matter because GitHub Pages loads fixed paths.
+        if(handle.name!==filename)throw new Error('파일 이름을 '+filename+'(으)로 저장해 줘.');
+        handles.set(filename,handle);
+      }
+      try{
+        const blob=await blobFactory();
+        const writer=await handle.createWritable();
+        try{await writer.write(blob);await writer.close()}
+        catch(err){try{await writer.abort()}catch{}throw err}
+        return 'saved';
+      }catch(err){handles.delete(filename);throw err}
+    }
+    // Non-Chromium fallback: preserve the old download behavior.
+    const blob=await blobFactory();
+    const url=URL.createObjectURL(blob);
+    try{const a=document.createElement('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove()}
+    finally{setTimeout(()=>URL.revokeObjectURL(url),10000)}
+    return 'downloaded';
+  }
+})());
+const guildSaveNotice=(result,filename)=>result==='saved'
+ ? filename+' 저장 완료! 같은 탭에서 다시 저장하면 기존 파일에 덮어써. GitHub에 올려 Commit changes를 눌러줘.'
+ : filename+' 다운로드 완료. 이 브라우저에서는 덮어쓰기가 지원되지 않아 파일명 중복이 생길 수 있어. GitHub에 업로드해 줘.';
+const guildSaveError=err=>err?.name==='AbortError'?null:(err?.message||String(err));
+
 const initial=window.PARTY_WEEKLY_BOARD||{version:2,items:[]};let items=structuredClone(initial.items||[]);window.PARTY_WEEKLY_BOARD={version:2,items};
 const DAYS=['월','화','수','목','금','토','일'],types=[['story','전래동화 · 보라'],['boss','필드 보스 · 빨강'],['battle','낙화의 전장 · 빨강'],['dragon','신기 쟁탈전 · 금색'],['garden','미혹의 정원 · 금색'],['reset','주간 초기화 · 청록'],['guild','문파 콘텐츠 · 파랑']];
 const editor=document.getElementById('entries'),status=document.getElementById('status'),controls=document.getElementById('placementControls');function show(t){status.textContent=t}function preview(){window.PARTY_WEEKLY_BOARD={version:2,items};window.dispatchEvent(new Event('party-board-refresh'))}
@@ -8,7 +45,7 @@ function verify(){if(items.length>60)throw Error('콘텐츠는 최대 60개까�
 function choose({idx,day}){const e=items[idx];if(!e)return;const pos=e.placements?.[day]||{};const row=Number(pos.row)||Math.min(12,idx+1),span=Number(pos.span)||1;controls.replaceChildren();const h=document.createElement('strong');h.textContent=`${DAYS[day]}요일 · ${e.title}`;controls.append(h);for(const [title,key,value,min,max] of [['세로 줄 (1~14)','row',row,1,14],['가로 길이 (요일 수)','span',span,1,7-day]]){const label=document.createElement('label');label.textContent=title;const inp=document.createElement('input');inp.type='number';inp.min=min;inp.max=max;inp.step='1';inp.value=value;inp.addEventListener('change',()=>{let v=Math.min(max,Math.max(min,Math.round(Number(inp.value)||min)));inp.value=v;e.placements||={};e.placements[day]={row:Number(e.placements[day]?.row)||row,span:Number(e.placements[day]?.span)||span,[key]:v};preview()});label.append(inp);controls.append(label)}const p=document.createElement('small');p.textContent='여러 날짜에 걸친 카드는 시작 요일에서 오른쪽으로 확장돼. 서로 같은 줄에 겹치지 않도록 놓아줘.';controls.append(p)}
 window.addEventListener('party-board-selected',ev=>choose(ev.detail));window.addEventListener('party-board-changed',()=>{render();show('카드 위치가 변경됐어. 저장하려면 다운로드를 눌러줘.')});
 document.getElementById('add').onclick=()=>{items.push({id:'e-'+Date.now()+'-'+items.length,title:'새 문파 콘텐츠',subtitle:'',time:'20:00',kind:'guild',days:[6],placements:{6:{row:8,span:1}}});render()};
-document.getElementById('save').onclick=()=>{try{verify();download('weekly-board-data.js','/* PARTY 주간 플래너 (V29) */\nwindow.PARTY_WEEKLY_BOARD = '+JSON.stringify({version:2,items},null,2)+';\n','text/javascript;charset=utf-8');show('다운로드 완료! weekly-board-data.js만 GitHub에 업로드해줘.')}catch(e){show(e.message)}};
+document.getElementById('save').onclick=async()=>{try{verify();const text='/* PARTY 주간 플래너 (V29) */\nwindow.PARTY_WEEKLY_BOARD = '+JSON.stringify({version:2,items},null,2)+';\n';const result=await guildSave('weekly-board-data.js',new Blob([text],{type:'text/javascript;charset=utf-8'}));show(guildSaveNotice(result,'weekly-board-data.js'))}catch(e){const msg=guildSaveError(e);if(msg)show(msg)}};
 document.getElementById('backup').onclick=()=>download('weekly-board-backup.json',JSON.stringify({version:2,items},null,2),'application/json');
 document.getElementById('restore').onchange=async ev=>{try{const f=ev.target.files[0];if(!f)return;const d=JSON.parse(await f.text());if(!Array.isArray(d.items))throw Error('백업 파일 형식이 아니야.');items=d.items.map((e,i)=>({id:String(e.id||i),title:String(e.title||''),subtitle:String(e.subtitle||''),time:String(e.time||''),kind:String(e.kind||'guild'),days:Array.isArray(e.days)?e.days.filter(v=>Number.isInteger(v)&&v>=0&&v<=6):[],placements:e.placements&&typeof e.placements==='object'?e.placements:{}}));verify();render();show('백업 불러오기 완료')}catch(e){show('불러오기 오류: '+e.message)}};render();
 })();
