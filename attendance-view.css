@@ -14,3 +14,15 @@ main{max-width:1160px;margin:auto;padding:34px 20px 44px}.eyebrow,.panel-caption
 @media(max-width:760px){.bar{flex-wrap:wrap;padding:14px 16px}.bar span{display:none}.bar strong{font-size:18px}main{padding:22px 13px}.date-panel{flex-direction:column;align-items:stretch;padding:16px}.date-controls{gap:6px}.date-controls button{padding:8px;font-size:12px;white-space:nowrap}.date-controls select{min-width:0;width:100%;font-size:13px;padding:8px 5px}.date-meta{text-align:left}.overview-grid{grid-template-columns:1fr}.overview-card.one{grid-column:auto}.overview-card{padding:17px}.card-heading h2{font-size:19px}.card-stats{gap:5px}.card-stat{padding:11px 3px}.card-stat strong{font-size:18px}.attendance-dialog{margin:0;width:100vw;height:100dvh;max-width:none;max-height:100dvh;border:0;border-radius:0}.dialog-layout{height:100dvh;max-height:100dvh}.dialog-header{padding:17px 16px 14px}.round-nav{padding:10px 12px;gap:6px}.round-nav button{font-size:12px;padding:8px;min-width:72px}.round-nav span{font-size:12px}.summary-bar{gap:5px;padding:11px 12px 6px}.summary-item strong{font-size:19px}.summary-item span{font-size:10px}.dialog-body{padding:10px 12px}.member-list{grid-template-columns:1fr;gap:7px}.dialog-footer{padding:11px 13px}.dialog-footer span{font-size:11px}}
 @media(min-width:761px) and (max-width:950px){.overview-card.one{grid-column:span 2}.date-panel{padding:16px}}
 @media(prefers-reduced-motion:no-preference){.overview-card,.view-button,.date-controls button{transition:background .15s ease,border-color .15s ease}}
+
+/* 2026-11-01: 문파원 공개 참여 방식 및 추첨권 표시 */
+.card-ticket-info{margin:-3px 0 0;font-size:12px;color:#ead0a1;line-height:1.5}
+.mode-guide{margin:0 0 13px;background:#243e51;border:1px solid #547286;color:#d7eaf6;padding:10px 12px;border-radius:9px;font-size:12px;line-height:1.55}
+.member-tags{display:flex;justify-content:flex-end;align-items:center;flex-wrap:wrap;gap:5px;max-width:75%}
+.mode-tag{display:inline-flex;align-items:center;border:1px solid #59728c;border-radius:6px;padding:5px 7px;font-size:11px;font-weight:750;white-space:normal;line-height:1.25;text-align:center;color:#eaf4ff;background:#304a68}
+.mode-tag.direct{background:#254f4a;border-color:#3b8977;color:#abf3d8}
+.mode-tag.auto{background:#665038;border-color:#967750;color:#ffdda0}
+.mode-tag.clone{background:#4b4966;border-color:#736d9a;color:#ddd8ff}
+.mode-tag.unconfirmed{background:#684d3e;border-color:#ba9162;color:#ffe5bd}
+.mode-tag.legacy{background:#34445d;border-color:#60718c;color:#d7e2f2}
+@media(max-width:760px){.member-tags{max-width:68%}.mode-tag{font-size:10px;padding:5px 6px}.mode-guide{font-size:11px}}

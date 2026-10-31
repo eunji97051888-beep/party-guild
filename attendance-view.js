@@ -4,10 +4,27 @@ const $=id=>document.getElementById(id);
 const area=$('attendView'),stamp=$('stamp'),dateSelect=$('dateSelect'),dateMeta=$('dateMeta');
 const older=$('olderDate'),newer=$('newerDate');
 const dialog=$('attendanceDialog'),dialogTitle=$('dialogTitle'),dialogSubtitle=$('dialogSubtitle');
-const roundNav=$('roundNav'),summaryBar=$('statusSummary'),filterArea=$('statusFilters'),memberList=$('memberList');
+const roundNav=$('roundNav'),summaryBar=$('statusSummary'),filterArea=$('statusFilters'),memberList=$('memberList'),modeGuide=$('modeGuide');
 const order=['요신토벌령','결계지방어','미혹의 정원','신기 쟁탈전'];
 const labels={present:'참석',absent:'불참',exempt:'제외',missing:'미입력'};
 const displayOrder=['present','absent','exempt','missing'];
+const TICKET_START='2026-10-30';
+const isPvP=s=>s.content==='신기 쟁탈전'||s.content==='미혹의 정원';
+const showModes=s=>s.date>=TICKET_START;
+function modeInfo(member,session){
+ if(statusKey(member.status)!=='present')return null;
+ if(!showModes(session))return {kind:'legacy',text:'기존 기준 · 1장',tickets:1};
+ const pv=isPvP(session),mode=member.mode;
+ if(mode==='direct')return {kind:'direct',text:`직접 참여 · ${pv?2:1}장`,tickets:pv?2:1};
+ if(pv&&mode==='auto')return {kind:'auto',text:'오토 방어 · 1장',tickets:1};
+ if(!pv&&mode==='clone')return {kind:'clone',text:'분신 등록 · 0장',tickets:0};
+ return {kind:'unconfirmed',text:`방식 확인 필요 · 임시 ${pv?2:1}장`,tickets:pv?2:1};
+}
+function modeStats(session){
+ const info={direct:0,auto:0,clone:0,unconfirmed:0,provisional:0,tickets:0};
+ for(const member of session.members||[]){const m=modeInfo(member,session);if(!m)continue;info.tickets+=m.tickets;if(m.kind in info)info[m.kind]++;if(m.kind==='unconfirmed')info.provisional+=m.tickets;}
+ return info;
+}
 const mk=(tag,cls,content)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(content!==undefined)n.textContent=String(content);return n};
 const statusKey=raw=>Object.prototype.hasOwnProperty.call(labels,raw)?raw:'missing';
 const dateText=raw=>{if(!/^\d{4}-\d\d-\d\d$/.test(raw||''))return raw||'날짜 미지정';const d=new Date(raw+'T12:00:00');return Number.isNaN(d.getTime())?raw:d.toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'})};
@@ -53,6 +70,7 @@ function renderDate(){
   const heading=mk('div','card-heading'),text=mk('div'),h2=mk('h2','',content),sub=mk('div','round-label',s.label||'회차 정보 없음'),pill=mk('span','round-pill',round.number+'회차');
   text.append(h2,sub);heading.append(text,pill);card.append(heading);
   const stats=mk('div','card-stats');for(const key of displayOrder){const item=mk('div','card-stat '+key);item.append(mk('strong','',count[key]),mk('span','',labels[key]));stats.append(item)}card.append(stats);
+  if(showModes(s)){const m=modeStats(s);const detail=mk('p','card-ticket-info',`추첨권 합계 ${m.tickets}장${m.unconfirmed?` · 방식 확인 필요 ${m.unconfirmed}명 (임시 포함)`:''}`);card.append(detail)}
   const view=mk('button','view-button','출석 현황 크게 보기 ↗');view.type='button';view.setAttribute('aria-label',`${content} ${dateText(activeDate)} 출석 현황 크게 보기`);view.addEventListener('click',()=>openDetail(s,view));card.append(view);
   area.append(card);
  }
@@ -75,6 +93,8 @@ function renderDetail(){
  prev.addEventListener('click',()=>{activeSession=ofContent[idx-1];activeFilter='all';renderDetail()});
  next.addEventListener('click',()=>{activeSession=ofContent[idx+1];activeFilter='all';renderDetail()});
  roundNav.append(prev,current,next);
+ const info=modeStats(s);
+ modeGuide.textContent=showModes(s)?`${isPvP(s)?'직접 2장 · 오토 방어 1장':'직접 1장 · 분신 등록 0장'} · 참석자 추첨권 합계 ${info.tickets}장${info.unconfirmed?` (참여 방식 미확인 ${info.unconfirmed}명 · 임시 계산 포함)`:''}`:'10월 30일 이전 회차 · 기존 기준 (참석 1회당 1장)';
  const totals=stat(s);summaryBar.replaceChildren();
  for(const key of displayOrder){const item=mk('div','summary-item '+key);item.append(mk('strong','',totals[key]),mk('span','',labels[key]));summaryBar.append(item)}
  renderFilters();renderMembers();
@@ -86,7 +106,12 @@ function renderFilters(){
 function renderMembers(){
  memberList.replaceChildren();const members=(activeSession?.members||[]).filter(m=>activeFilter==='all'||statusKey(m.status)===activeFilter);
  if(!members.length){memberList.append(mk('p','filter-empty','해당 상태인 문파원이 없어.'));return}
- for(const member of members){const row=mk('div','member-row'),name=mk('span','member-name',member.name||'이름 없음'),key=statusKey(member.status),status=mk('span','state '+key,labels[key]);row.append(name,status);memberList.append(row)}
+ for(const member of members){
+  const row=mk('div','member-row'),name=mk('span','member-name',member.name||'이름 없음'),key=statusKey(member.status),status=mk('span','state '+key,labels[key]);
+  const tags=mk('span','member-tags');tags.append(status);
+  const detail=modeInfo(member,activeSession);if(detail){tags.append(mk('span','mode-tag '+detail.kind,detail.text))}
+  row.append(name,tags);memberList.append(row)
+ }
 }
 function closeDetail(){if(dialog.open&&typeof dialog.close==='function')dialog.close();else{dialog.removeAttribute('open');document.body.style.overflow='';lastOpener?.focus()}}
 $('closeDialog').addEventListener('click',closeDetail);$('bottomCloseDialog').addEventListener('click',closeDetail);

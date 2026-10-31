@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#1b2437">
   <title>파티 문파 | 콘텐츠 출석 현황</title>
-  <link rel="stylesheet" href="attendance-view.css?v=20261016-date-view">
+  <link rel="stylesheet" href="attendance-view.css?v=20261101-modes">
 </head>
 <body>
   <header class="bar">
@@ -17,7 +17,7 @@
   <main>
     <p class="eyebrow">PUBLIC ATTENDANCE · READ ONLY</p>
     <h1>⚔️ 콘텐츠 출석 현황</h1>
-    <p class="intro">출석일을 선택하고, 콘텐츠의 <strong>출석 현황 보기</strong>를 누르면 문파원 명단을 크게 볼 수 있어.</p>
+    <p class="intro">출석일과 콘텐츠를 선택하면 참석 여부, 직접·오토·분신 참여 방식 및 추첨권을 확인할 수 있어. 10월 30일 이전 기록은 기존 출석 방식으로 표시돼.</p>
     <div class="stamp" id="stamp" role="status">게시된 출석 자료 확인 중…</div>
 
     <section class="date-panel" aria-label="출석 날짜 선택">
@@ -50,6 +50,7 @@
       <div id="roundNav" class="round-nav"></div>
       <div id="statusSummary" class="summary-bar"></div>
       <div class="dialog-body">
+        <p id="modeGuide" class="mode-guide"></p>
         <div id="statusFilters" class="status-filters" aria-label="출석 상태 필터"></div>
         <div id="memberList" class="member-list"></div>
       </div>
@@ -60,6 +61,6 @@
     </div>
   </dialog>
 
-  <script defer src="attendance-view.js?v=20261025-rounds"></script>
+  <script defer src="attendance-view.js?v=20261101-modes"></script>
 </body>
 </html>

@@ -72,7 +72,10 @@ const eligibleWrap=document.createElement('label');eligibleWrap.className='membe
 const dateBtn=document.createElement('button');dateBtn.className='btn secondary';dateBtn.textContent='가입정보 저장';dateBtn.onclick=()=>{if(joined.value&&eligible.value&&eligible.value<joined.value){alert('출석 대상 시작일은 가입일보다 빠를 수 없어.');return}m.joinDate=joined.value;m.eligibleFrom=eligible.value;update()};
 line.append(input,btn,dateWrap,eligibleWrap,dateBtn,toggle);if(!m.active){const tag=document.createElement('span');tag.textContent='탈퇴';tag.className='tag';line.append(tag)}list.append(line)}
 renderSessionManager();
-const session=state.sessions.find(s=>s.id===activeSession);$('currentSessionLabel').textContent=session?`${session.content} · ${session.round}회차 · ${sessionDescription(session)}`:'회차를 선택해 줘';const area=$('attendanceArea');area.replaceChildren();if(session){const records=state.attendance[session.id]||{};const sessionMembers=state.members.filter(m=>m.active||Object.prototype.hasOwnProperty.call(records,m.id));if(!sessionMembers.length){const p=document.createElement('p');p.className='muted';p.textContent='먼저 문파원을 추가해 줘.';area.append(p)}for(const m of sessionMembers){
+const session=state.sessions.find(s=>s.id===activeSession);
+const bulk=$('confirmUnclassifiedBtn');
+if(bulk){const unknown=session&&session.date>=TICKET_START?state.members.filter(m=>state.attendance[session.id]?.[m.id]==='present'&&!state.participationModes?.[session.id]?.[m.id]):[];bulk.style.display=unknown.length?'inline-block':'none';bulk.textContent=`미확인 ${unknown.length}명 직접 참여로 확정`;}
+$('currentSessionLabel').textContent=session?`${session.content} · ${session.round}회차 · ${sessionDescription(session)}`:'회차를 선택해 줘';const area=$('attendanceArea');area.replaceChildren();if(session){const records=state.attendance[session.id]||{};const sessionMembers=state.members.filter(m=>m.active||Object.prototype.hasOwnProperty.call(records,m.id));if(!sessionMembers.length){const p=document.createElement('p');p.className='muted';p.textContent='먼저 문파원을 추가해 줘.';area.append(p)}for(const m of sessionMembers){
  const r=document.createElement('div');r.className='attendrow'+(session.date>=TICKET_START?' ticket-mode-row':'');
  const name=document.createElement('strong');name.textContent=m.name+(m.active?'':' (탈퇴)');
  const sel=document.createElement('select');sel.setAttribute('aria-label',m.name+' 출석');
@@ -97,16 +100,16 @@ const session=state.sessions.find(s=>s.id===activeSession);$('currentSessionLabe
  if(session.date>=TICKET_START){
   const wrap=document.createElement('div');wrap.className='attendance-ticket-wrap';
   const mode=document.createElement('select');mode.setAttribute('aria-label',m.name+' 참여 방식');
-  const choices=isPvP(session)?[['direct','직접 참여 · 2장'],['auto','오토 방어 · 1장']]:[['direct','직접 참여 · 1장'],['clone','분신 등록 · 0장']];
+  const choices=isPvP(session)?[['','⚠ 참여 방식 확인 필요'],['direct','직접 참여 · 2장'],['auto','오토 방어 · 1장']]:[['','⚠ 참여 방식 확인 필요'],['direct','직접 참여 · 1장'],['clone','분신 등록 · 0장']];
   for(const [value,label] of choices){const o=document.createElement('option');o.value=value;o.textContent=label;mode.append(o)}
   const stored=state.participationModes?.[session.id]?.[m.id];
-  mode.value=choices.some(c=>c[0]===stored)?stored:'direct';
+  mode.value=choices.some(c=>c[0]===stored)?stored:'';
   const note=document.createElement('small');note.className='ticket-mode-note';
   if(sel.value!=='present')note.textContent='참석 체크 후 방식 선택';
-  else if(!stored)note.textContent='기존 참석 기록 · 직접으로 간주 (확인 필요)';
+  else if(!stored)note.textContent=`방식 확인 필요 · 추첨기는 임시 ${ticketCount(session,'present','direct')}장으로 계산`;
   else note.textContent=`추첨권 ${ticketCount(session,'present',mode.value)}장`;
   mode.disabled=sel.value!=='present'||joinedLate;
-  mode.onchange=()=>{(state.participationModes[session.id]??={})[m.id]=mode.value;update()};
+  mode.onchange=()=>{state.participationModes[session.id]??={};if(mode.value)state.participationModes[session.id][m.id]=mode.value;else delete state.participationModes[session.id][m.id];update()};
   wrap.append(mode,note);r.append(wrap);
  }
  area.append(r)
@@ -216,4 +219,12 @@ $('addSession').onclick=()=>{const content=$('contentSelect').value,date=$('sess
 refreshDraftRound();
 $('backupBtn').onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`party-attendance-${nowDate()}.json`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000)};
 $('restoreInput').onchange=async()=>{const file=$('restoreInput').files?.[0];if(!file)return;try{if(file.size>4*1024*1024)throw Error('백업 파일이 너무 커.');const incoming=safeData(JSON.parse(await file.text()));if(!confirm('현재 이 브라우저의 모든 문파원/회차/출석 데이터를 백업 파일 내용으로 바꿀까? 기존 기록은 덮어써져.'))return;const previous=state;state=incoming;if(!save()){state=previous;return}activeSession=null;editingSessionId=null;sessionFilter='all';render();refreshDraftRound();alert('백업을 불러왔어.')}catch(e){alert('백업을 불러오지 못했어: '+e.message)}finally{$('restoreInput').value=''}};
+const bulkConfirm=$('confirmUnclassifiedBtn');
+if(bulkConfirm)bulkConfirm.onclick=()=>{
+ const session=state.sessions.find(s=>s.id===activeSession);if(!session||session.date<TICKET_START)return;
+ const unknown=state.members.filter(m=>state.attendance[session.id]?.[m.id]==='present'&&!state.participationModes?.[session.id]?.[m.id]);
+ if(!unknown.length){alert('참여 방식 미확인 참석자가 없어.');return}
+ if(!confirm(`${session.content} ${session.date} · 참여 방식 미확인 ${unknown.length}명을 모두 직접 참여로 확정할까?\n실제로 오토·분신이었던 사람은 먼저 구분하거나 확정 후 반드시 수정해 줘.`))return;
+ state.participationModes[session.id]??={};for(const m of unknown)state.participationModes[session.id][m.id]='direct';update();
+};
 render();})();
