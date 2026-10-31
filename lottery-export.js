@@ -37,14 +37,24 @@ function calculate(data,selected,period,start,end){
  if(!validDate(start)||!validDate(end)||start>end)throw Error('집계 시작일과 종료일을 다시 확인해 줘.');
  if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(period))throw Error('정산 연월을 선택해 줘.');
  const sessions=data.sessions.filter(s=>s.date>=start&&s.date<=end&&(selected==='all'||s.content===selected));
- const counts={};
+ const counts={};let unclassified=0,zeroTicketParticipations=0;
  for(const member of data.members){
   if(!member||member.active!==true||typeof member.name!=='string'||!member.name.trim())continue;
   let count=0;
-  for(const session of sessions)if(data.attendance[session.id]?.[member.id]==='present')count++;
+  for(const session of sessions){
+   if(data.attendance[session.id]?.[member.id]!=='present')continue;
+   const mode=data.participationModes?.[session.id]?.[member.id];
+   if(session.date>='2026-10-30'&&!mode)unclassified++;
+   let tickets;
+   if(session.date<'2026-10-30')tickets=1; // 기존 정산 기준 보존
+   else if(session.content==='신기 쟁탈전'||session.content==='미혹의 정원')tickets=mode==='auto'?1:2;
+   else tickets=mode==='clone'?0:1; // 요신토벌령 / 결계지방어
+   count+=tickets;
+   if(tickets===0)zeroTicketParticipations++;
+  }
   if(count>0)counts[member.name.trim()]=(counts[member.name.trim()]||0)+count;
  }
- return {counts,sessions,eligible:Object.keys(counts).length,tickets:Object.values(counts).reduce((a,b)=>a+b,0)};
+ return {counts,sessions,eligible:Object.keys(counts).length,tickets:Object.values(counts).reduce((a,b)=>a+b,0),unclassified,zeroTicketParticipations};
 }
 function update(){
  try{
@@ -54,7 +64,7 @@ function update(){
   for(const o of [...contentEl.options])if(o.value!=='all'&&!names.includes(o.value))o.remove();
   if(selected!=='all'&&names.includes(selected))contentEl.value=selected;
   const result=calculate(data,contentEl.value,periodEl.value,startEl.value,endEl.value);
-  summary.textContent=`${periodEl.value} 정산 · ${startEl.value} ~ ${endEl.value} · 집계 ${result.sessions.length}회차 · 추첨 대상 ${result.eligible}명 · 총 추첨권 ${result.tickets}장 (탈퇴자·참석 0회 제외)`;
+  summary.textContent=`${periodEl.value} 정산 · ${startEl.value} ~ ${endEl.value} · 집계 ${result.sessions.length}회차 · 추첨 대상 ${result.eligible}명 · 총 추첨권 ${result.tickets}장 (추첨권 0장·탈퇴자 제외)`+(result.unclassified?` · ⚠ 참여 방식 미확인 ${result.unclassified}건: 기본 직접 참여로 계산 중!`:``)+(result.zeroTicketParticipations?` · 분신 등록 0장 ${result.zeroTicketParticipations}건`:``);
   button.disabled=!result.eligible;
  }catch(error){summary.textContent=error.message;button.disabled=true;}
 }
@@ -64,7 +74,7 @@ button.addEventListener('click',()=>{
   const result=calculate(data,contentEl.value,period,start,end);
   if(!result.eligible)throw Error('해당 기간의 추첨 대상자가 없어.');
   const list=result.sessions.map(s=>`${s.date} ${s.content} ${s.round||''}회차`).join('\n');
-  const msg=`정산: ${period}\n기간: ${start} ~ ${end}\n콘텐츠: ${contentEl.options[contentEl.selectedIndex].text}\n집계 ${result.sessions.length}회차 · 추첨 대상 ${result.eligible}명 · 추첨권 ${result.tickets}장\n\n집계한 회차:\n${list||'없음'}\n\n기간이 이전 분배와 겹치지 않는지 확인했어?`;
+  const msg=`정산: ${period}\n기간: ${start} ~ ${end}\n콘텐츠: ${contentEl.options[contentEl.selectedIndex].text}\n집계 ${result.sessions.length}회차 · 추첨 대상 ${result.eligible}명 · 추첨권 ${result.tickets}장\n\n기준: 10/30부터 신기/미혹 직접 2장 · 오토 1장, 요신/결계 직접 1장 · 분신 0장\n${result.unclassified?`\n⚠ 참여 방식 미확인 ${result.unclassified}건은 직접 참여로 계산 중! 오토/분신 인원을 수정했는지 확인해.\n`:''}\n집계한 회차:\n${list||'없음'}\n\n기간이 이전 분배와 겹치지 않는지 확인했어?`;
   if(!confirm(msg))return;
   const payload={schema_version:2,settlement_period:period,attendance_range:{start,end},content_filter:contentEl.value,source_session_ids:result.sessions.map(s=>s.id),participants:result.counts};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
