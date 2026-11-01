@@ -130,6 +130,10 @@ window.PARTY_DEFAULT = {
     {
       "title": "21일 도술 요령서에 대해서?",
       "id": "sIaZ5MgE1xc"
+    },
+    {
+      "title": "10월31일패치 이후 보스덱 쓸만함!!",
+      "id": "91jERb56lPM"
     }
   ]
 };
