@@ -11,7 +11,7 @@ const sourceRef=doc(db,'guildPrivate','attendanceEditorSandbox_20261103');
 const publicRef=doc(db,'publicContent','attendancePublicSandbox_20261103');
 const $=id=>document.getElementById(id);
 const isAdmin=()=>auth.currentUser?.uid===ADMIN_UID;
-let src=null, publicDoc=null, publicChecked=false, busy=false;
+let src=null, publicDoc=null, publicChecked=false, busy=false, verificationCompleted=false, isCurrentAlreadyPublished=false;
 const writeStatus=(id,message,error=false)=>{const e=$(id);e.textContent=message;e.style.color=error?'#ffbfbd':'#bff0cf'};
 const api=()=>window.PARTY_ATTENDANCE_EXPORT;
 function valid(data){
@@ -29,6 +29,8 @@ function valid(data){
  return data;
 }
 const canonical=v=>Array.isArray(v)?v.map(canonical):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,canonical(v[k])])):v;
+// publishedAt is created at preview time, not part of the attendance ledger's identity.
+const withoutGeneratedTimestamp=p=>{const {publishedAt,...rest}=p||{};return rest};
 async function digest(v){
  const data=new TextEncoder().encode(JSON.stringify(canonical(v)));
  const bytes=await crypto.subtle.digest('SHA-256',data);
@@ -38,7 +40,8 @@ function controls(){
  $('login').disabled=busy||isAdmin();
  $('source').disabled=busy||!isAdmin();
  $('check').disabled=busy||!isAdmin();
- $('publish').disabled=busy||!isAdmin()||!src||!publicChecked;
+ $('verify').disabled=busy||!isAdmin()||!src||!publicChecked||!publicDoc;
+ $('publish').disabled=busy||!isAdmin()||!src||!publicChecked||(!!publicDoc&&!verificationCompleted)||isCurrentAlreadyPublished;
 }
 function summary(payload){
  const rows=payload.sessions.flatMap(s=>s.members.filter(m=>m.status==='present').map(m=>({...m,date:s.date,content:s.content})));
@@ -56,13 +59,13 @@ function extract(raw){const payload=api()?.createPayload(valid(raw));if(!payload
 }
 onAuthStateChanged(auth,user=>{
  // Never silently reuse data and controls across different auth sessions.
- src=null;publicDoc=null;publicChecked=false;$('sourceStats').hidden=true;
+ src=null;publicDoc=null;publicChecked=false;verificationCompleted=false;isCurrentAlreadyPublished=false;$('sourceStats').hidden=true;
  writeStatus('authStatus',isAdmin()?'✓ Firebase 관리자 인증 완료':user?'이 Google 계정은 관리자로 승인되지 않았어.':'Google 관리자 계정으로 로그인해 줘.',!!user&&!isAdmin());
- writeStatus('sourceStatus','');writeStatus('publicStatus','미확인');writeStatus('publishStatus','');controls();
+ writeStatus('sourceStatus','');writeStatus('publicStatus','미확인');writeStatus('publishStatus','');writeStatus('verifyStatus','');controls();
 });
 $('login').onclick=async()=>{busy=true;controls();try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){writeStatus('authStatus','Google 로그인 실패: '+(e.code||e.message),true)}finally{busy=false;controls()}};
 $('source').onclick=async()=>{
- if(!isAdmin())return;busy=true;controls();src=null;publicChecked=false;
+ if(!isAdmin())return;busy=true;controls();src=null;publicChecked=false;verificationCompleted=false;isCurrentAlreadyPublished=false;writeStatus('verifyStatus','');
  try{
   const snap=await getDocFromServer(sourceRef);if(!snap.exists())throw Error('3단계 시험 장부가 없어. 먼저 3단계에서 시험 장부를 만들어 줘.');
   const d=snap.data(),rev=d.revision;if(!Number.isSafeInteger(rev)||rev<1)throw Error('시험 장부 버전이 올바르지 않아.');
@@ -73,13 +76,38 @@ $('source').onclick=async()=>{
  }catch(e){writeStatus('sourceStatus','조회 실패: '+(e.code||e.message)+'\nFirebase 규칙을 바꾸지 말고 알려줘.',true)}finally{busy=false;controls()}
 };
 $('check').onclick=async()=>{
- if(!isAdmin())return;busy=true;controls();publicChecked=false;
+ if(!isAdmin())return;busy=true;controls();publicChecked=false;verificationCompleted=false;isCurrentAlreadyPublished=false;writeStatus('verifyStatus','');
  try{
   const snap=await getDocFromServer(publicRef);publicDoc=snap.exists()?snap.data():null;
   if(publicDoc&&(!Number.isSafeInteger(publicDoc.revision)||publicDoc.revision<1))throw Error('공개 시험 문서 버전 오류');
   publicChecked=true;
-  writeStatus('publicStatus',publicDoc?`✓ 공개 시험 문서 있음 · 게시 버전 ${publicDoc.revision}, 출처 장부 버전 ${publicDoc.sourceRevision}\n다시 게시하면 같은 시험 문서만 갱신돼.`:'✓ 공개 시험 문서 없음 · 첫 게시가 가능해.');
+  writeStatus('publicStatus',publicDoc?`✓ 공개 시험 문서 있음 · 게시 버전 ${publicDoc.revision}, 출처 장부 버전 ${publicDoc.sourceRevision}\n먼저 ③ '기존 게시 내용 대조' 버튼으로 저장 없이 확인해 줘.`:'✓ 공개 시험 문서 없음 · 첫 게시가 가능해.');
  }catch(e){publicDoc=null;writeStatus('publicStatus','시험 문서 상태 조회 실패: '+(e.code||e.message),true)}finally{busy=false;controls()}
+};
+// Existing public test document may already have been committed even if the old
+// key-order-sensitive post-write check incorrectly displayed a failure. READ ONLY.
+$('verify').onclick=async()=>{
+ if(!isAdmin()||!src||!publicChecked||!publicDoc||busy)return;
+ busy=true;controls();verificationCompleted=false;isCurrentAlreadyPublished=false;
+ writeStatus('verifyStatus','⏳ 기존 공개 시험 문서를 Firebase 서버에서 읽어 비교 중…');
+ try{
+  const [origin,current]=await Promise.all([getDocFromServer(sourceRef),getDocFromServer(publicRef)]);
+  if(!origin.exists()||!current.exists())throw Error('시험 문서가 없어졌어. 저장하지 않고 종료할게.');
+  const original=origin.data(),saved=current.data();
+  const freshSourceHash=await digest(original.data);
+  if(original.revision!==src.rev||freshSourceHash!==src.hash)throw Error('시험 장부가 조회 후 바뀌었어. 원본부터 다시 읽어 줘.');
+  if(saved.format!=='party-attendance-public-v2'||saved.payload?.version!==2||!Array.isArray(saved.payload.sessions))throw Error('공개 데이터 형식이 다르니 덮어쓰면 안 돼.');
+  const matched=(saved.sourceRevision===src.rev&&saved.sourceDataHash===src.hash&&
+   await digest(withoutGeneratedTimestamp(saved.payload))===await digest(withoutGeneratedTimestamp(src.payload)));
+  publicDoc=saved;publicChecked=true;verificationCompleted=true;
+  if(matched){
+   isCurrentAlreadyPublished=true;
+   writeStatus('verifyStatus',`✅ 기존 시험 게시 검증 성공! 공개 버전 ${saved.revision} · 출석 ${saved.payload.sessions.length}회차 · 원본과 내용 일치.\n추가로 저장할 필요 없어. 아래 Firebase 공개 화면을 열어 봐.`);
+  } else {
+   writeStatus('verifyStatus','⚠️ 기존 공개 시험 문서가 현재 시험 장부와 달라. 자동 덮어쓰지 않았어. 새 게시 전에 내용을 먼저 확인해 줘.',true);
+  }
+ }catch(e){verificationCompleted=false;writeStatus('verifyStatus','검증 실패: '+(e.code||e.message)+'\n어떤 파일도 저장하지 않았어. 이 메시지를 보내줘.',true)}
+ finally{busy=false;controls()}
 };
 $('publish').onclick=async()=>{
  if(!isAdmin()||!src||!publicChecked||busy)return;
@@ -99,10 +127,10 @@ $('publish').onclick=async()=>{
    tx.set(publicRef,{format:'party-attendance-public-v2',revision:nextRev,sourceRevision:preview.rev,sourceDataHash:preview.hash,payload:preview.payload,updatedAt:serverTimestamp()});
   },{maxAttempts:3});
   const again=await getDocFromServer(publicRef);
-  const record=again.data();if(!again.exists()||record.revision!==nextRev||record.sourceDataHash!==preview.hash||JSON.stringify(record.payload)!==JSON.stringify(preview.payload))throw Error('서버 재조회 결과가 게시 원본과 일치하지 않아.');
-  publicDoc=record;publicChecked=true;
+  const record=again.data();if(!again.exists()||record.format!=='party-attendance-public-v2'||record.revision!==nextRev||record.sourceRevision!==preview.rev||record.sourceDataHash!==preview.hash||await digest(record.payload)!==await digest(preview.payload))throw Error('서버 재조회 결과가 게시 원본과 일치하지 않아.');
+  publicDoc=record;publicChecked=true;verificationCompleted=true;isCurrentAlreadyPublished=true;
   writeStatus('publicStatus',`✓ 공개 시험 문서 확인됨 · 게시 버전 ${nextRev}`);
   writeStatus('publishStatus',`✅ Firebase 시험 게시 성공 · 서버 재조회 일치 · ${preview.payload.sessions.length}회차 · 시험 게시 버전 ${nextRev}\n이제 아래 Firebase 공개 화면 보기를 눌러 확인해 줘.`);
- }catch(e){src=null;publicDoc=null;publicChecked=false;writeStatus('publishStatus','🔴 게시 중단: '+(e.code||e.message)+'\n안전 장치가 충돌 또는 권한 문제를 감지했어. 규칙을 바꾸지 말고 이 메시지를 보내줘.',true)}finally{busy=false;controls()}
+ }catch(e){src=null;publicDoc=null;publicChecked=false;verificationCompleted=false;isCurrentAlreadyPublished=false;writeStatus('publishStatus','🔴 게시 중단: '+(e.code||e.message)+'\n안전 장치가 충돌 또는 권한 문제를 감지했어. 규칙을 바꾸지 말고 이 메시지를 보내줘.',true)}finally{busy=false;controls()}
 };
 controls();
