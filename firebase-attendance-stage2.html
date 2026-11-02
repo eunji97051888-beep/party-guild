@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>파티 문파 | Firebase 출석 최초 저장 시험</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:linear-gradient(155deg,#2d3953 0,#1a263b 58%,#131d2d);min-height:100vh;color:#eff3fc;font:16px/1.65 system-ui,"Malgun Gothic",sans-serif;padding:30px 16px}main{max-width:900px;margin:auto}.eyebrow{color:#fac080;font-size:12px;letter-spacing:2.5px;font-weight:800}h1{font-size:clamp(25px,4.4vw,37px);line-height:1.25;margin:12px 0}h2{margin:0 0 14px;font-size:21px}.intro{color:#becfe9;margin:0 0 23px}.panel{padding:24px;margin:17px 0;background:#273650;border:1px solid #475a78;border-radius:18px}.safe{color:#f6d39b;background:#39372e;border:1px solid #8d7845;border-radius:13px;padding:15px 17px;margin:17px 0;line-height:1.65}button{padding:12px 18px;font:inherit;font-weight:750;border:0;border-radius:9px;background:#eac08b;color:#18243a;cursor:pointer}button.secondary{background:#40597b;color:#f7f9ff}button:disabled{cursor:not-allowed;opacity:.43}button.danger{background:#f9cb92}.row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:14px 0}.line{color:#cdd9ed;margin:10px 0;white-space:pre-wrap;overflow-wrap:anywhere}.line.ok{color:#a6ebc5}.line.warn{color:#ffd88b}.line.err{color:#ffc2be}.file-label{display:inline-block;padding:10px 14px;background:#405776;color:#fff;border-radius:8px;cursor:pointer;font-weight:700}.file-label input{display:none}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px}.stat{border:1px solid #526784;border-radius:11px;padding:13px;background:#203047}.stat b{display:block;font-size:25px}.stat span{color:#b9cce4;font-size:12px}.mono{font-family:ui-monospace,Consolas,monospace;overflow-wrap:anywhere}.path{display:inline-block;padding:3px 8px;background:#14243e;border-radius:6px;color:#eac08b}.note{font-size:13px;color:#b5c8e4}.okmark{color:#a6ebc5}a{color:#ffd18e}#verifyDetail{padding:15px;border-radius:9px;background:#1b2a41;white-space:pre-wrap;overflow-wrap:anywhere}button:focus-visible,.file-label:focus-within{outline:3px solid #fff;outline-offset:3px}@media(max-width:630px){.stats{grid-template-columns:repeat(2,1fr)}.panel{padding:17px}}
+</style></head><body><main>
+<div class="eyebrow">PARTY GUILD · FIREBASE RECOVERY / STEP 2</div>
+<h1>출석 14회차 · 안전 최초 저장</h1>
+<p class="intro">운영 중인 홈페이지와 문주편집기는 그대로 유지하고, <strong>관리자 전용 시험 문서 1개</strong>에만 출석 백업을 처음 저장한 다음 다시 읽어서 검사하는 페이지야.</p>
+<div class="safe">🔒 <b>안전 장치</b> · 기존 <span class="mono">guildPrivate/attendanceBackup</span> 및 홈페이지 공개 자료는 수정하지 않아. 시험 문서가 이미 있으면 <strong>덮어쓰기 금지</strong>. GitHub에 출석 JSON을 올리지 말고 PC에서만 선택해 줘. 이 시험만으로 문파원 홈페이지가 자동 갱신되지는 않아.</div>
+<section class="panel"><h2>① 최신 출석 JSON 선택</h2>
+<p class="note">11월 1일 출석까지 추가한 <span class="mono">party-attendance-2026-11-03(1).json</span>을 선택해 줘.</p>
+<div class="row"><label class="file-label">JSON 파일 선택 <input id="localFile" type="file" accept=".json,application/json"></label><span id="filename" class="note">선택된 파일 없음</span></div>
+<div id="localStatus" class="line">아직 파일을 선택하지 않았어.</div><div id="localStats" class="stats" hidden></div>
+<p id="hashStatus" class="note"></p></section>
+<section class="panel"><h2>② 관리자 로그인 · 시험 문서 상태 확인</h2>
+<p class="note">시험 저장 위치: <span class="path mono">guildPrivate/attendanceStaging_20261103</span></p>
+<div class="row"><button id="loginBtn" class="secondary">Google 로그인</button><button id="logoutBtn" class="secondary" hidden>로그아웃</button><button id="checkBtn" class="secondary" disabled>시험 저장 위치 확인</button></div>
+<div id="authStatus" class="line">로그인 상태를 확인하는 중이야.</div><div id="cloudStatus" class="line">로그인 후 저장 위치를 확인해 줘.</div></section>
+<section class="panel"><h2>③ 최초 1회만 저장</h2>
+<p class="note">최신 JSON 검사 + 관리자 로그인 + <b>해당 문서가 비어 있음</b>이 모두 확인됐을 때만 버튼이 활성화돼. 저장하기 전에 확인 창이 한 번 더 나와.</p>
+<div class="row"><button id="uploadBtn" disabled>시험 문서에 최초 저장 (기존 데이터 덮어쓰기 없음)</button></div><div id="uploadStatus" class="line">아직 저장하지 않았어.</div>
+</section><section class="panel"><h2>④ 서버에서 다시 읽고 원본과 대조</h2>
+<div class="row"><button id="verifyBtn" class="secondary" disabled>서버 자료 재조회 · 일치 검사</button></div><div id="verifyStatus" class="line">원본 JSON과 시험 문서가 준비되면 검사할 수 있어.</div><div id="verifyDetail" hidden></div></section>
+<p class="note">이 페이지는 운영 중인 <span class="mono">index.html / admin.html / members.html / attendance-view.html</span>을 수정하지 않아. 시험에서 오류가 나오면 중단하고 오류 문구만 알려줘. <b>Firebase 규칙이나 기존 백업을 임의로 수정하지 마.</b></p>
+<a href="firebase-attendance-check.html">← 1단계 읽기 전용 점검</a></main>
+<script type="module" src="./firebase-attendance-stage2.js"></script>
+</body></html>
