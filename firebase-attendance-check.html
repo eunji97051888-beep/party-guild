@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>파티 문파 · Firebase 출석 복구 사전 점검</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,"Malgun Gothic",sans-serif;background:#111c2d;color:#eff3fb}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#253554,#101827 80%);min-height:100vh}
+main{max-width:900px;margin:0 auto;padding:42px 18px 70px}.eyebrow{letter-spacing:.19em;color:#f0c58b;font-size:12px;font-weight:800}
+h1{font-size:clamp(25px,4.5vw,37px);margin:10px 0}p{line-height:1.7}.sub{color:#c4d0e3;margin:0 0 20px}
+.notice{border:1px solid #9f854c;background:#302d25;border-radius:12px;padding:13px 16px;color:#ffe6b1;font-size:14px;line-height:1.6}
+.panel{background:#202e46;border:1px solid #3b506d;border-radius:17px;padding:22px;margin-top:18px}.panel h2{margin:0 0 12px;font-size:20px}.subtle{color:#b5c4db;font-size:13px}
+.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0}.btn{background:#edc17d;color:#242015;padding:11px 16px;border:0;border-radius:10px;font-weight:800;cursor:pointer;font-size:14px}.btn.secondary{background:#374e72;color:#f1f4fc}.btn:disabled{opacity:.45;cursor:not-allowed}
+input[type=file]{max-width:100%;color:#d2dfef;font-size:14px}.line{margin:13px 0 4px;font-weight:700;white-space:pre-wrap;line-height:1.6}
+.error{color:#ffb8b8}.success{color:#a3e4b9}.warn{color:#ffe0a3}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:14px 0}.stat{border:1px solid #415573;background:#152339;border-radius:9px;padding:13px}.stat b{font-size:23px;display:block}.stat span{font-size:12px;color:#c4cfe0}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#121f32;padding:15px;border-radius:10px;border:1px solid #3d5370;font:13px/1.7 ui-monospace,Consolas,monospace;max-height:340px;overflow:auto}
+footer{color:#b8c7df;font-size:13px;line-height:1.7;margin:30px 3px}
+@media(max-width:560px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:17px}}
+</style>
+</head>
+<body>
+<main>
+<div class="eyebrow">PARTY GUILD · SAFE RECOVERY / STEP 1</div>
+<h1>Firebase 출석 연결 점검</h1>
+<p class="sub">현재 홈페이지·문주편집기·Firestore 데이터는 변경하지 않고 <strong>최신 출석 백업과 과거 클라우드 백업을 읽어서 비교</strong>하는 독립 시험 페이지야.</p>
+<div class="notice"><strong>🔒 읽기 전용</strong> · 저장, 복원, 삭제, 추첨 실행 기능은 없어. 테스트가 끝나기 전에는 문주편집기의 <strong>클라우드 복원/덮어쓰기</strong>를 누르지 마. 이 페이지는 Google 계정 인증 후 관리자에게 허용된 Firestore 문서 한 개만 읽어.</div>
+<section class="panel"><h2>① 최신 출석 JSON 불러오기</h2><p class="subtle">PC에 저장해 둔 <code>party-attendance-2026-11-03(1).json</code> 파일을 선택해. 파일은 브라우저 메모리에서만 분석하며 Firebase로 전송하지 않아.</p><div class="actions"><input id="localInput" aria-label="최신 JSON 파일 선택" type="file" accept=".json,application/json"></div><div id="localStatus" class="line" role="status">아직 선택하지 않았어.</div><div id="localStats" class="stats" hidden></div></section>
+<section class="panel"><h2>② Firebase의 예전 백업 읽기</h2><p class="subtle">예전에 사용하던 <code>guildPrivate/attendanceBackup</code> 문서 한 개만 읽어. 백업 문서가 없으면 없는 그대로 알려줄게.</p><div class="actions"><button class="btn" id="loginBtn">Google로 로그인</button><button class="btn secondary" id="readBtn" disabled>클라우드 백업 읽기 (저장 안 함)</button><button class="btn secondary" id="logoutBtn" hidden>로그아웃</button></div><div id="cloudStatus" class="line" role="status">아직 Firebase에 접속하지 않았어.</div><div id="cloudStats" class="stats" hidden></div></section>
+<section class="panel"><h2>③ 차이점 확인</h2><p class="subtle">두 자료를 모두 읽으면 회원 고유 ID, 회차 ID, 출석 상태와 직접·오토 구분을 비교해. 결과는 개수만 표시해서 문파원 명단을 노출하지 않아.</p><button class="btn" id="compareBtn" disabled>두 백업 비교</button><div id="compareStatus" class="line">최신 JSON과 Firebase 데이터를 각각 읽은 후 비교할 수 있어.</div><pre id="compareReport" hidden></pre><button class="btn secondary" id="copyBtn" hidden>결과 요약 복사</button></section>
+<footer>이 파일들은 정상 운영 중인 <strong>index.html / members.html / attendance-view.html</strong>을 수정하지 않아. Firebase 연결을 영구적으로 복구하는 작업은 이번 비교 결과를 확인한 뒤 별도의 복사본에서 진행해.</footer>
+</main>
+<script type="module" src="firebase-attendance-check.js"></script>
+</body>
+</html>
