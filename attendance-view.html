@@ -18,7 +18,7 @@
     <p class="eyebrow">PUBLIC ATTENDANCE · READ ONLY</p>
     <h1>⚔️ 콘텐츠 출석 현황</h1>
     <p class="intro">출석일과 콘텐츠를 선택하면 참석 여부, 직접·오토·분신 참여 방식 및 추첨권을 확인할 수 있어. 10월 30일 이전 기록은 기존 출석 방식으로 표시돼.</p>
-    <div class="stamp" id="stamp" role="status">게시된 출석 자료 확인 중…</div>
+    <div class="stamp" id="stamp" role="status">Firebase 서버의 출석 자료 확인 중…</div>
 
     <section class="date-panel" aria-label="출석 날짜 선택">
       <div>
@@ -34,7 +34,7 @@
     </section>
 
     <div id="attendView" class="overview-grid" aria-live="polite"></div>
-    <p class="foot">출석 내용에 이견이 있다면 문주에게 알려줘. 공개 기록은 문주가 갱신한 파일을 기준으로 표시돼.</p>
+    <p class="foot">출석 내용에 이견이 있다면 문주에게 알려줘. 공개 기록은 Firebase에 저장된 최신 출석 장부를 기준으로 자동 갱신돼.</p>
   </main>
 
   <dialog id="attendanceDialog" class="attendance-dialog" aria-labelledby="dialogTitle">
@@ -61,6 +61,6 @@
     </div>
   </dialog>
 
-  <script defer src="attendance-view.js?v=20261101-modes"></script>
+  <script defer src="attendance-view-firebase-live.js?v=20261103-stage7"></script>
 </body>
 </html>
