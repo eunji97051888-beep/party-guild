@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>파티 문파 | Firebase 보상·당첨·킵 최종 이전</title>
+<style>
+:root{font-family:system-ui,'Malgun Gothic',sans-serif;color-scheme:dark;background:#202b3c;color:#e4edfa}*{box-sizing:border-box}body{margin:0}main{max-width:1070px;padding:28px 20px 70px;margin:auto}a{color:#e8bf79}h1{font-size:clamp(25px,4vw,36px);margin:8px 0 12px;color:#f1c784}h2{font-size:21px;margin:0 0 12px;color:#f4d39d}p{line-height:1.65}small,.muted{color:#b3c3d9}.tag{font-size:11px;letter-spacing:2px;color:#f5c880;font-weight:700}.panel{background:#2b3c56;border:1px solid #48617f;border-radius:16px;padding:22px;margin-top:18px}.banner{background:#403d39;border-color:#99784a}.actions{display:flex;align-items:center;flex-wrap:wrap;gap:10px}button,.filebtn{font:inherit;color:#152439;background:#edc17b;border:1px solid #edc17b;border-radius:9px;font-weight:800;padding:13px 17px;cursor:pointer;display:inline-block}button.alt,.filebtn.alt{background:#405879;color:#f0f4fc;border-color:#627896}button:disabled{opacity:.42;cursor:not-allowed}.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.card{padding:18px;background:#223149;border:1px solid #425777;border-radius:12px;min-width:0}.card h3{font-size:17px;margin:0 0 9px;color:#f2cc8c}.card p{margin:7px 0;overflow-wrap:anywhere}.status{white-space:pre-wrap;line-height:1.6;font-size:14px}.ok{color:#8be7b8}.warn{color:#ffe0a4}.err{color:#ffb2aa}label.checkbox{display:flex;gap:10px;margin:14px 0;line-height:1.5;align-items:flex-start}input[type=checkbox]{width:18px;height:18px;flex:none;margin-top:3px}input[type=file]{max-width:100%;display:block;font-size:13px;margin-top:7px}footer{color:#9caec7;margin-top:24px;font-size:13px;line-height:1.6}code{background:#202c3f;color:#f4ce9b;padding:2px 5px;border-radius:4px}strong{color:#f6dba9}#overall{font-weight:750}.nowrap{white-space:nowrap}@media(max-width:780px){.cards{grid-template-columns:1fr}.panel{padding:17px}button{width:100%}}
+</style></head><body><main>
+<a href="admin.html">← 문주편집기로 돌아가기</a><p class="tag">PARTY · FIREBASE / FINAL DATA MIGRATION</p><h1>🏆 보상 · 당첨 · 킵 기록 통합 이전</h1>
+<p>현재 브라우저의 보상 장부와 GitHub 공개 당첨·킵 자료를 Firebase의 기존 기록과 대조해. <strong>새 서버 문서만 최초 생성</strong>하고, 이미 등록된 자료를 변경하거나 오래된 자료를 자동으로 최신 취급하지 않아.</p>
+<section class="panel banner"><strong>운영 기록 보호</strong><p>출석 14회차·공지·플래너·기존 보상 백업·GitHub 공개 파일은 수정하지 않아. 충돌이 있으면 전체 저장을 중지해. 백업 JSON은 GitHub에 올리지 마.</p></section>
+<section class="panel"><h2>① 자료 자동 점검</h2><div class="actions"><button id="login">문주 Google 로그인</button><button class="alt" id="audit">공개 파일·Firebase 한번에 확인</button></div><p id="authStatus" class="status muted" aria-live="polite">관리자 계정 확인 중…</p><p id="auditStatus" class="status muted">점검 전</p>
+<div class="cards">
+<div class="card"><h3>💰 재화·지급 장부</h3><p id="rewardInfo">자료 확인 전</p><label>다른 PC에서 받은 보상 백업 JSON<input type="file" id="rewardFile" accept=".json,application/json"></label><p id="rewardServer" class="status muted"></p></div>
+<div class="card"><h3>🏆 추첨 결과</h3><p id="drawInfo">자료 확인 전</p><label>최신 결과 공개 파일 (.js/.json)이 따로 있을 때<input type="file" id="drawFile" accept=".js,.json"></label><p id="drawServer" class="status muted"></p></div>
+<div class="card"><h3>🪙 킵·지급 잔액</h3><p id="balanceInfo">자료 확인 전</p><label>최신 킵 장부 파일 (.js/.json)이 따로 있을 때<input type="file" id="balanceFile" accept=".js,.json"></label><p id="balanceServer" class="status muted"></p></div>
+</div>
+<p id="conflict" class="status warn"></p>
+</section>
+<section class="panel"><h2>② 안전 백업 및 최초 이전</h2>
+<p>위 자료 개수·추첨일·잔액을 확인하고 진행해. 모든 준비된 자료를 <strong>한 번의 Firebase 트랜잭션</strong>으로 최초 등록하고, 이미 있는 문서는 건드리지 않아. 자료가 없는 항목은 등록하지 않아.</p>
+<div class="actions"><button class="alt" id="backup" disabled>현재 자료·기존 기록 통합 백업 다운로드</button></div>
+<label class="checkbox"><input id="checkedSources" type="checkbox"><span>추첨일·결과 건수와 킵 잔액·보상 장부의 금액을 확인했어. 오래된 자료면 최신 파일을 직접 선택했어.</span></label>
+<label class="checkbox"><input id="checkedBackup" type="checkbox"><span>통합 백업 JSON이 내 PC에 실제로 저장된 걸 확인했어.</span></label>
+<div class="actions"><button id="migrate" disabled>준비된 기록 Firebase 최초 등록 (한 번만)</button></div>
+<p id="writeStatus" class="status muted" aria-live="polite">현재는 저장하지 않았어.</p>
+</section>
+<section class="panel"><h2>③ 이후 운영</h2><p>최초 등록 후에는 <a href="rewards.html">재화·보상 관리</a>에서 서버 장부를 수정하고, <a href="lottery-results-editor.html">행운의전당 결과 편집기</a>에서 새 당첨 결과를 게시해. <a href="lottery-balances-firebase-admin.html">킵 잔액 관리</a>에서는 최신 장부를 확인하고 게시해.</p><p>문파원 공개 확인: <a href="lottery-results.html">🏆 행운의전당</a> · <a href="attendance-view.html">출석 게시판</a></p></section>
+<footer>이 페이지는 GitHub 코드나 다른 Firebase 운영 문서를 수정하지 않아. 서버 문서는 관리자 보안 규칙으로 제한되어야 하며, 저장 전후 서버 재조회 검증을 수행해. 사용 중인 다른 브라우저에서의 미저장 기록은 자동으로 찾아낼 수 없어.</footer>
+</main>
+<script type="module">
+import {refs,db,isAdmin,waitAuth,login,read,runTransaction,serverTimestamp,asJSON} from './party-firebase-shared.js';
+const $=id=>document.getElementById(id);
+const info={reward:'rewardInfo',draw:'drawInfo',balance:'balanceInfo'},server={reward:'rewardServer',draw:'drawServer',balance:'balanceServer'};
+const refKeys={reward:refs.rewards,draw:refs.draws,balance:refs.balances};
+const formatLabels={reward:'보상 장부',draw:'당첨 결과',balance:'킵 잔액'};
+const state={pub:{},pc:null,legacy:null,docs:{},files:{reward:null,draw:null,balance:null},candidates:{},audit:false,busy:false,imported:false};
+const msg=(id,s,type='')=>{const e=$(id);e.className='status '+(type||'muted');e.textContent=s};
+const iso=()=>new Date().toISOString().slice(0,10);
+const norm=v=>Array.isArray(v)?v.map(norm):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,norm(v[k])])):v;
+const equal=(a,b)=>JSON.stringify(norm(a))===JSON.stringify(norm(b));
+const bytes=v=>new Blob([JSON.stringify(v)]).size;
+const nonneg=n=>Number.isSafeInteger(n)&&n>=0;
+const clone=asJSON;
+function rewardValid(x){
+ if(!x||x.version!==1||!nonneg(x.balance)||!Array.isArray(x.items)||!Array.isArray(x.requests)||!Array.isArray(x.ledger)||x.items.length>1000||x.requests.length>10000||x.ledger.length>30000)throw Error('보상 장부의 기본 형식 오류');
+ for(const i of x.items)if(!i||typeof i.id!=='string'||typeof i.name!=='string'||i.name.length>80||!nonneg(i.price)||!nonneg(i.stock))throw Error('보상 아이템 정보 오류');
+ for(const r of x.requests)if(!r||typeof r.id!=='string'||typeof r.memberId!=='string'||typeof r.memberName!=='string'||typeof r.itemName!=='string'||!Number.isSafeInteger(r.qty)||r.qty<1||!['requested','purchased','paid'].includes(r.status)||typeof r.date!=='string'||(r.price!==undefined&&!nonneg(r.price)))throw Error('보상 지급 요청 오류');
+ for(const l of x.ledger)if(!l||typeof l.date!=='string'||typeof l.note!=='string'||!Number.isSafeInteger(l.change)||!Number.isSafeInteger(l.after))throw Error('재화 거래 장부 오류');
+ if(!x.balance&&!x.items.length&&!x.requests.length&&!x.ledger.length)throw Error('내용이 없는 보상 장부는 최초 등록하지 않아');
+ if(bytes(x)>600000)throw Error('보상 장부가 600KB를 초과해');return clone(x);
+}
+function drawsValid(x){
+ if(!Array.isArray(x)||!x.length||x.length>250)throw Error('추첨 결과가 없거나 배열 형식이 아니야');
+ const dates=new Set();for(const d of x){if(!d||typeof d.started_at_kst!=='string'||!d.started_at_kst.trim()||dates.has(d.started_at_kst)||!Array.isArray(d.winners)||!d.winners.length||d.winners.length>100)throw Error('중복되거나 비어 있는 추첨 회차가 있어');dates.add(d.started_at_kst);if(!nonneg(d.total_tickets)||!nonneg(d.participant_count))throw Error('추첨 인원·추첨권 정보 오류');const ws=new Set();for(const w of d.winners){if(!w||!Number.isSafeInteger(w.round)||w.round<1||typeof w.name!=='string'||!w.name.trim()||ws.has(w.name))throw Error('추첨 당첨자 중복·형식 오류');ws.add(w.name)}}
+ if(bytes(x)>600000)throw Error('추첨 결과가 600KB를 초과해');return clone(x);
+}
+function balancesValid(x){
+ if(!x||x.schema_version!==1||typeof x.currency!=='string'||!x.currency.trim()||!Array.isArray(x.members)||!x.members.length||x.members.length>500||!nonneg(x.total_pending_coins))throw Error('킵 잔액 형식 또는 기록 없음');
+ let sum=0;const names=new Set();for(const m of x.members){if(!m||typeof m.name!=='string'||!m.name.trim()||names.has(m.name)||!nonneg(m.awarded_coins)||!nonneg(m.paid_coins)||!nonneg(m.pending_coins)||m.pending_coins!==m.awarded_coins-m.paid_coins)throw Error('킵 잔액 개인별 계산 오류');sum+=m.pending_coins;names.add(m.name)}if(sum!==x.total_pending_coins)throw Error('킵 잔액 합계 오류');if(bytes(x)>600000)throw Error('킵 장부가 600KB를 초과해');return clone(x);
+}
+const validator={reward:rewardValid,draw:drawsValid,balance:balancesValid};
+const summaries={
+ reward:x=>`재화 ${x.balance.toLocaleString()} · 아이템 ${x.items.length}건 · 요청 ${x.requests.length}건 · 거래 ${x.ledger.length}건`,
+ draw:x=>`당첨 발표 ${x.length}회 · 당첨자 총 ${x.reduce((s,v)=>s+v.winners.length,0)}명 · 마지막 추첨 ${[...x].map(v=>v.started_at_kst).sort().at(-1)||'미기록'}`,
+ balance:x=>`지급·킵 대상 ${x.members.length}명 · 미지급 ${x.total_pending_coins.toLocaleString()} 문파주화 · 게시 기준 ${x.exported_at_kst||'미기록'}`};
+function unpack(source,kind){
+ const varName=kind==='draw'?'PARTY_LOTTERY_RESULTS':'PARTY_LOTTERY_BALANCES';
+ const match=source.match(new RegExp('^\\s*window\\.'+varName+'\\s*=\\s*([\\s\\S]*?)\\s*;?\\s*$'));
+ if(!match)throw Error('올바른 '+varName+' 공개 JS 파일 형식이 아니야');
+ let payload=match[1].trim().replace(/;\s*$/,'');return JSON.parse(payload);
+}
+async function fetchPublic(kind,name){
+ const response=await fetch('./'+name+'?_audit='+Date.now(),{cache:'no-store'});if(!response.ok)throw Error(name+' 다운로드 실패: HTTP '+response.status);return validator[kind](unpack(await response.text(),kind));
+}
+async function fileValue(kind,file){if(file.size>650000)throw Error('선택 파일 용량이 너무 커');const raw=await file.text();return validator[kind](file.name.toLowerCase().endsWith('.js')?unpack(raw,kind):JSON.parse(raw))}
+function fileHint(kind){const file=state.files[kind];return file?`선택 파일: ${file.name}`:kind==='reward'?'같은 브라우저 또는 예전 Firebase 백업':'현재 GitHub 공개 JS 파일'}
+function recompute(){
+ state.candidates={};const conflicts=[];
+ for(const kind of ['reward','draw','balance']){
+  let x=state.files[kind]||null;
+  if(!x&&kind==='reward'){
+   if(state.pc&&state.legacy&&!equal(state.pc,state.legacy)){conflicts.push('보상 장부: 이 PC 기록과 과거 Firebase 백업이 다름. 어느 쪽이 최신인지 확인 후 보상 백업 JSON을 선택해 줘.');}
+   else x=state.pc||state.legacy||null;
+  }
+  if(!x&&kind!=='reward')x=state.pub[kind]||null;
+  if(x)state.candidates[kind]=x;
+  const s=state.docs[kind];
+  const preview=x?`${summaries[kind](x)}\n출처: ${fileHint(kind)}`:'아직 안전하게 이전할 수 있는 자료가 없어. 이전에 쓰던 PC 또는 백업 JSON을 확인해 줘.';
+  $(info[kind]).textContent=preview;
+  if(s){
+   const doc=s.data();let status='';
+   if(s.exists()){
+    if(!Number.isSafeInteger(doc.revision)||doc.revision<1||!doc.data){conflicts.push(formatLabels[kind]+': Firebase 운영 문서 형식이 예상과 달라');status='⛔ Firebase 기존 자료 구조 확인 필요';}
+    else{
+     try{validator[kind](doc.data);if(x&&!equal(x,doc.data)){conflicts.push(formatLabels[kind]+': 서버에 이미 다른 운영 기록이 있음. 자동 덮어쓰기 중단');status=`⛔ 서버 버전 ${doc.revision}과 선택 자료가 달라. 기존 자료 보존.`}
+      else status=`✅ Firebase 운영 문서 이미 있음 · 버전 ${doc.revision} · ${summaries[kind](doc.data)}`;
+     }catch(e){conflicts.push(formatLabels[kind]+': Firebase 저장 형식 오류');status='⛔ 서버 문서 검증 실패: '+e.message}
+    }
+   }else status=x?'🟡 Firebase 문서 없음 · 최초 등록 준비':'⚪ Firebase 문서 없음 · 원본 자료 필요';
+   msg(server[kind],status,status.startsWith('⛔')?'err':status.startsWith('✅')?'ok':'warn');
+  }
+ }
+ if(conflicts.length)msg('conflict','⛔ 검토 필요:\n'+conflicts.join('\n'),'err');else msg('conflict','✅ 자료 간 확인된 충돌 없음. 게시일·금액이 최신인지 사람이 확인해야 해.','ok');
+ const ready=state.audit&&!conflicts.length&&Object.keys(state.candidates).length>0;
+ $('backup').disabled=!ready||state.busy;
+ $('migrate').disabled=!ready||state.busy||!$('checkedSources').checked||!$('checkedBackup').checked||state.imported;
+ const pending=['reward','draw','balance'].filter(k=>state.docs[k]&&!state.docs[k].exists()&&!state.candidates[k]);
+ if(pending.length&&!conflicts.length)msg('writeStatus',`⚠️ 아직 자료를 찾지 못한 항목: ${pending.map(k=>formatLabels[k]).join(', ')}. 준비된 다른 항목은 별도로 최초 등록할 수 있지만, 전체 이전 완료는 아니야.`,'warn');
+ }
+async function serverAudit(){
+ if(!isAdmin())throw Error('먼저 문주 Google 로그인 필요');
+ state.audit=false;state.docs={};state.busy=true;recompute();msg('auditStatus','Firebase 문서 및 옛 백업 조회 중…');
+ try{
+  const [r,d,b,legacy]=await Promise.all([read(refs.rewards),read(refs.draws),read(refs.balances),read(refs.legacyRewards)]);
+  state.docs={reward:r,draw:d,balance:b};
+  state.legacy=legacy.exists()&&legacy.data()?.data?rewardValid(legacy.data().data):null;
+  if(state.legacy)msg('auditStatus','Firebase 운영 자료 3종 조회 완료 · 예전 보상 백업도 확인','ok');
+  else msg('auditStatus','Firebase 운영 자료 3종 조회 완료 · 예전 보상 백업은 없음','ok');
+  state.audit=true;
+ }catch(e){msg('auditStatus','서버 자료 조회 오류: '+(e.code||e.message),'err');state.docs={};state.audit=false}
+ finally{state.busy=false;recompute()}
+}
+async function publicAudit(){
+ for(const [kind,file] of [['draw','lottery-results-data.js'],['balance','lottery-balances-data.js']]){
+  try{state.pub[kind]=await fetchPublic(kind,file)}catch(e){state.pub[kind]=null;msg('auditStatus','GitHub 공개 자료 읽기 오류: '+e.message,'err')}
+ }
+ try{const s=localStorage.getItem('party-guild-v12-rewards');state.pc=s?rewardValid(JSON.parse(s)):null}catch(e){state.pc=null;msg('rewardInfo','브라우저 보상 장부 파싱 오류. 백업 파일을 선택해 줘.','err')}
+ recompute();
+}
+async function auditAll(){
+ state.busy=true;state.audit=false;msg('auditStatus','공개 파일·브라우저 원본 읽는 중…');
+ try{await publicAudit();if(isAdmin())await serverAudit();else msg('auditStatus','공개 파일 확인 완료 · 서버 조회는 관리자 로그인 후 가능','warn')}
+ finally{state.busy=false;recompute()}
+}
+async function manualFile(kind,file){if(!file)return;try{const v=await fileValue(kind,file);state.files[kind]=v;recompute();msg('auditStatus',formatLabels[kind]+' 선택 파일 검사 통과 · 서버와 비교해 줘','ok')}catch(e){state.files[kind]=null;recompute();msg('auditStatus','파일 오류: '+e.message,'err')}}
+function downloadJSON(value,name){const blob=new Blob([JSON.stringify(value,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),20000)}
+function backup(){
+ const live={};for(const kind of ['reward','draw','balance']){const s=state.docs[kind];live[kind]=s?.exists()?asJSON(s.data()):null}
+ downloadJSON({generatedAt:new Date().toISOString(),purpose:'파티 문파 Firebase 최초 이전 안전 백업. GitHub 업로드 금지',currentBrowserRewards:state.pc,previousFirebaseRewardsBackup:state.legacy,githubPublishedResults:state.pub.draw,githubPublishedBalances:state.pub.balance,selectedCandidates:state.candidates,existingFirebaseLive:live},'party-final-migration-backup-'+iso()+'.json');
+ msg('writeStatus','통합 JSON 백업 다운로드를 요청했어. 실제 파일이 저장됐는지 다운로드 폴더에서 확인해 줘.','warn');
+}
+async function migrate(){
+ if(!isAdmin()||!state.audit||state.busy||state.imported||!$('checkedSources').checked||!$('checkedBackup').checked)return;
+ const candidates=clone(state.candidates),kinds=['reward','draw','balance'];
+ if(!Object.keys(candidates).length)return;
+ const pending=kinds.filter(k=>candidates[k]&&!state.docs[k]?.exists());
+ const missing=kinds.filter(k=>!candidates[k]&&!state.docs[k]?.exists());
+ const preview=kinds.map(k=>`${formatLabels[k]}: ${state.docs[k]?.exists()?'기존 서버 문서 유지':candidates[k]?'신규 생성':'자료 없어 미이전'}`).join('\n');
+ if(!pending.length)return msg('writeStatus','새로 등록할 자료는 없어. 기존 Firebase 운영 자료를 유지했어.','ok');
+ if(!confirm('기존 운영 데이터는 절대 덮어쓰지 않아. 다음 항목을 최초 등록할까?\n\n'+preview+'\n\n기존 출석·공지·플래너·보상 백업은 변경되지 않아.'))return;
+ if(missing.length&&!confirm('⚠️ '+missing.map(k=>formatLabels[k]).join(' / ')+' 항목은 자료가 없어 이번에 이전하지 못해. 나머지 항목만 등록할까?'))return;
+ state.busy=true;recompute();msg('writeStatus','Firebase 신규 문서만 최초 생성 중…');
+ try{
+  await runTransaction(db,async tx=>{
+   const snaps=[];for(const kind of kinds)snaps.push(await tx.get(refKeys[kind]));
+   for(let i=0;i<kinds.length;i++){
+    const kind=kinds[i],s=snaps[i],data=candidates[kind];
+    if(!s.exists())continue;
+    const v=s.data();if(!v||!Number.isSafeInteger(v.revision)||!v.data)throw Error(formatLabels[kind]+': 기존 서버 문서 구조 불일치');
+    if(data&&!equal(v.data,data))throw Error(formatLabels[kind]+': 다른 탭에서 서버 기록이 변경됨. 저장 중단');
+   }
+   for(let i=0;i<kinds.length;i++){
+    const kind=kinds[i],s=snaps[i],data=candidates[kind];
+    if(!s.exists()&&data){validator[kind](data);tx.set(refKeys[kind],{format:kind==='reward'?'party-rewards-live-v1':kind==='draw'?'party-lottery-results-v1':'party-lottery-balances-v1',revision:1,data:asJSON(data),updatedAt:serverTimestamp()})}
+   }
+  });
+  const verifies=await Promise.all(kinds.map(k=>read(refKeys[k])));
+  for(let i=0;i<kinds.length;i++){const k=kinds[i],s=verifies[i],data=candidates[k];if(!s.exists())continue;if(!Number.isSafeInteger(s.data()?.revision)||!s.data()?.data)throw Error(formatLabels[k]+' 서버 재조회 형식 확인 실패');if(data&&!equal(s.data().data,data))throw Error(formatLabels[k]+' 서버 재조회 내용 불일치')}
+  state.imported=true;msg('writeStatus',`✅ Firebase 최초 등록·서버 재조회 성공: ${pending.map(k=>formatLabels[k]).join(', ')}.\n${missing.length?'⚠️ 아직 미이전: '+missing.map(k=>formatLabels[k]).join(', '):'🎉 준비한 3종 모두 서버 등록 완료.'}\n공개 화면에서 확인할 수 있어.`,'ok');
+ }catch(e){msg('writeStatus','⛔ 최초 등록 중단/검증 실패: '+(e.code||e.message)+'\n다시 누르지 말고 서버 재확인 버튼으로 상태를 확인해 줘.','err')}
+ finally{state.busy=false;await serverAudit();recompute()}
+}
+$('login').onclick=async()=>{try{if(!isAdmin())await login();msg('authStatus','✅ 문주 Google 관리자 인증 완료','ok');await auditAll()}catch(e){msg('authStatus','로그인 오류: '+(e.code||e.message),'err')}};
+$('audit').onclick=()=>auditAll();$('backup').onclick=backup;$('migrate').onclick=migrate;
+for(const [kind,id] of [['reward','rewardFile'],['draw','drawFile'],['balance','balanceFile']])$(id).addEventListener('change',e=>manualFile(kind,e.target.files?.[0]));
+for(const id of ['checkedSources','checkedBackup'])$(id).addEventListener('change',recompute);
+await waitAuth();if(isAdmin())msg('authStatus','✅ 이미 문주 Google 계정으로 로그인되어 있어','ok');else msg('authStatus','문주 계정으로 로그인 후 서버 조회 가능','warn');await auditAll();
+</script></body></html>
