@@ -91,7 +91,13 @@ const $=id=>document.getElementById(id),days=['일','월','화','수','목','금
 
  // Small self-contained ZIP writer (STORE method). No CDN or paid service required.
  const encoder=new TextEncoder();
- const crcTable=(()=>{const table=new Uint32Array(256);for(let i=0;i<256;i++){let c=i;for(let j=0;j<8;j++)c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1);table[i]=c>>>0}return table})();
+ const crcTable=(()=>{const table=new Uint32Array(256);for(let i=0;i<256;i++){let c=i;for(let j=0;j<8;j++)c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1);table[i]=c>>>0}return table
+ window.PARTY_GUILD_HOME_EDITOR={
+  get:async()=>{const blob=generateDataBlob();if(!blob)throw Error('편집 내용을 검증해 줘.');const t=await blob.text();return JSON.parse(t.replace(/^window\.PARTY_DEFAULT\s*=\s*/, '').replace(/;\s*$/, ''));},
+  set:d=>{if(!d||!Array.isArray(d.notices)||!Array.isArray(d.events))throw Error('서버 내용 형식 오류');for(const key of Object.keys(original))delete original[key];Object.assign(original,structuredClone(d));populate();},
+  lock:locked=>{const ids=['quoteTitleInput','quoteSubtitleInput','note','rows','noticeRows','linkRows','videoRows','add','addNotice','addLink','addVideo','reset'];for(const id of ids){const el=$(id);if(!el)continue;if(['rows','noticeRows','linkRows','videoRows'].includes(id)){el.inert=locked;el.style.opacity=locked?'0.58':''}else el.disabled=locked;}}
+ };
+})();
  function crc32(bytes){let c=0xFFFFFFFF;for(let i=0;i<bytes.length;i++)c=crcTable[(c^bytes[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0}
  function packZip(entries){const chunks=[],central=[];let pos=0;const push=(arr)=>{chunks.push(arr);pos+=arr.length};
  for(const [name,data] of entries){const label=encoder.encode(name),crc=crc32(data),offset=pos;
@@ -125,4 +131,10 @@ const $=id=>document.getElementById(id),days=['일','월','화','수','목','금
  };
  $('imageFile').onchange=()=>{let f=$('imageFile').files?.[0];if(currentPreview)URL.revokeObjectURL(currentPreview);if(!f){$('exportImage').disabled=true;return}if(!['image/png','image/jpeg','image/webp'].includes(f.type)||f.size>15*1024*1024){alert('15MB 이하 PNG/JPG/WEBP 이미지로 선택해 줘.');$('imageFile').value='';return}currentPreview=URL.createObjectURL(f);$('preview').src=currentPreview;$('exportImage').disabled=false};
  $('exportImage').onclick=async()=>{try{const f=$('imageFile').files?.[0];if(!f)return;const result=await guildSave('weekly.png',async()=>{const bitmap=await createImageBitmap(f);const canvas=document.createElement('canvas');canvas.width=bitmap.width;canvas.height=bitmap.height;canvas.getContext('2d').drawImage(bitmap,0,0);bitmap.close();return await new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(Error('이미지 변환 실패')),'image/png'))},'image/png');$('status').textContent=guildSaveNotice(result,'weekly.png')}catch(e){const msg=guildSaveError(e);if(msg)alert('이미지 저장 실패: '+msg)}};
+
+ window.PARTY_GUILD_HOME_EDITOR={
+  get:async()=>{const blob=generateDataBlob();if(!blob)throw Error('편집 내용을 검증해 줘.');const t=await blob.text();return JSON.parse(t.replace(/^window\.PARTY_DEFAULT\s*=\s*/, '').replace(/;\s*$/, ''));},
+  set:d=>{if(!d||!Array.isArray(d.notices)||!Array.isArray(d.events))throw Error('서버 내용 형식 오류');for(const key of Object.keys(original))delete original[key];Object.assign(original,structuredClone(d));populate();},
+  lock:locked=>{const ids=['quoteTitleInput','quoteSubtitleInput','note','rows','noticeRows','linkRows','videoRows','add','addNotice','addLink','addVideo','reset'];for(const id of ids){const el=$(id);if(!el)continue;if(['rows','noticeRows','linkRows','videoRows'].includes(id)){el.inert=locked;el.style.opacity=locked?'0.58':''}else el.disabled=locked;}}
+ };
 })();

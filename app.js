@@ -6,7 +6,7 @@
 
  const notices=Array.isArray(data.notices)?data.notices:[];
  const noticeRoot=$('noticeItems');
- const sortedNotices=notices.slice().sort((a,b)=>Number(Boolean(b.pinned))-Number(Boolean(a.pinned))||(b.date||'').localeCompare(a.date||''));
+ let sortedNotices=notices.slice().sort((a,b)=>Number(Boolean(b.pinned))-Number(Boolean(a.pinned))||(b.date||'').localeCompare(a.date||''));
  $('noticeCount').textContent=sortedNotices.length+'개 공지';
  const publicPageSize=5;
  let publicPage=0;
@@ -61,5 +61,17 @@
   currentVideos=(videoItems||[]).map(v=>({title:v.title,id:youtubeID(v)})).filter(v=>v.title&&v.id).reverse();videoIndex=0;paintVideos();
  };
  window.PARTY_RENDER_MEDIA(Array.isArray(data.resources)?data.resources:[],Array.isArray(data.videos)?data.videos:(window.PARTY_VIDEOS||[]));
+ window.addEventListener('party-content-home-changed',event=>{
+  const next=event.detail;if(!next||!Array.isArray(next.events)||!Array.isArray(next.notices))return;
+  Object.assign(data,next);
+  sortedNotices=data.notices.slice().sort((a,b)=>Number(Boolean(b.pinned))-Number(Boolean(a.pinned))||(b.date||'').localeCompare(a.date||''));
+  publicPage=0;$('noticeCount').textContent=sortedNotices.length+'개 공지';
+  $('quoteTitle').textContent=data.quoteTitle??'함께 즐기고 웃는 우리 문파';
+  $('quoteSubtitle').textContent=data.quoteSubtitle??'';
+  $('note').textContent=data.note||'';
+  renderNotices();render();
+  window.PARTY_RENDER_MEDIA(Array.isArray(data.resources)?data.resources:[],Array.isArray(data.videos)?data.videos:[]);
+ });
+
 
 })();

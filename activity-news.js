@@ -1,6 +1,6 @@
 (()=>{'use strict';
 const list=document.getElementById('activityNewsList'),pages=document.getElementById('activityNewsPages');if(!list)return;
-const arr=Array.isArray(window.PARTY_ACTIVITY_NEWS)?window.PARTY_ACTIVITY_NEWS.filter(x=>x&&x.title).slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||String(b.id||'').localeCompare(String(a.id||''))):[];
+let arr=Array.isArray(window.PARTY_ACTIVITY_NEWS)?window.PARTY_ACTIVITY_NEWS.filter(x=>x&&x.title).slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||String(b.id||'').localeCompare(String(a.id||''))):[];
 let page=1;const perPage=3;
 function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=String(text);return e}
 function render(){list.replaceChildren();pages.replaceChildren();const total=Math.max(1,Math.ceil(arr.length/perPage));page=Math.max(1,Math.min(page,total));
@@ -11,4 +11,6 @@ arr.slice((page-1)*perPage,page*perPage).forEach(post=>{
  const linkrow=el('div','activity-news-links');[['attendance','attendance-view.html','출석 현황 보기 →'],['rewards','rewards.html','보상 내역 보기 →']].forEach(([name,url,label])=>{if(post.link===name){const a=el('a','',label);a.href=url+(name==='attendance'&&/^\d{4}-\d{2}-\d{2}$/.test(String(post.date||''))?'?date='+encodeURIComponent(post.date):'');linkrow.append(a)}});if(linkrow.childNodes.length)card.append(linkrow);list.append(card)});
 function btn(label,p,active=false){const b=el('button','',label);b.type='button';if(active)b.setAttribute('aria-current','page');b.disabled=p===page;b.addEventListener('click',()=>{page=p;render()});pages.append(b)}
 if(total>1){if(page>1)btn('‹',page-1);const start=Math.max(1,Math.min(page-2,total-4));for(let i=start;i<=Math.min(total,start+4);i++)btn(i,i,i===page);if(page<total)btn('›',page+1)}
-}render()})();
+}
+window.addEventListener('party-content-activity-changed',event=>{const next=event.detail;if(!Array.isArray(next))return;arr=next.filter(x=>x&&x.title).slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||String(b.id||'').localeCompare(String(a.id||'')));page=1;render()});
+render()})();
