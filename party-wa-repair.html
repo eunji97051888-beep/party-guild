@@ -6,9 +6,9 @@
 <div class="panel guard"><strong>기존 기록 보호</strong><p>Firebase 보상 장부 <b>1개 문서만</b> 변경해. 당첨자 원본·킵 잔액·출석·공지·홈페이지는 수정하지 않아. 구매·지급 사실이 다르면 복구 버튼을 누르지 마.</p></div>
 <div class="panel"><h2>① Firebase 자료 확인</h2><div class="actions"><button class="btn" id="login">문주 Google 로그인</button><button class="btn secondary" id="audit">서버 자료 한 번에 확인</button></div><p id="status">Firebase 연결 확인 중…</p>
 <div class="stats"><div class="stat"><div class="label">현재 보상 장부 잔액</div><div class="big" id="before">—</div></div><div class="stat"><div class="label">누락 차감 복구 후 잔액</div><div class="big" id="after">—</div></div><div class="stat"><div class="label">기존 킵 잔액</div><div class="big" id="pending">—</div></div></div>
-<h2>10월 28일 당첨자 6명</h2><p class="small" id="count">조회 전</p><table><thead><tr><th>당첨자</th><th>기존 지급 상태</th><th>보상 구매 기록</th></tr></thead><tbody id="winners"></tbody></table>
+<h2>10월 28일 당첨자 6명</h2><p class="small" id="count">조회 전</p><p class="small" id="purchaseAudit">구매 내역을 조회하면 10월 28일 건수와 다른 날짜 건수를 구분해서 보여 줘.</p><table><thead><tr><th>당첨자</th><th>기존 지급 상태</th><th>보상 구매 기록</th></tr></thead><tbody id="winners"></tbody></table>
 </div>
-<div class="panel"><h2>② 백업 후 누락 1건 복구</h2><p>기존 구매 4건을 보존하면서 <strong>와르의 누락된 20개 구매·지급 이력을 추가</strong>하고, 공동 재화를 <strong>9,550 → 4,950주화</strong>로 맞춰.</p><div class="actions"><button class="btn secondary" id="backup" disabled>수정 전 Firebase 장부 백업</button><button class="btn" id="repair" disabled>와르 누락 4,600주화 차감·기록 복구 (1회)</button></div><p class="small">서버 기록이 예상과 다르거나 이미 정정됐으면 버튼이 잠겨. 두 번 차감되지 않도록 처리해.</p></div>
+<div class="panel"><h2>② 백업 후 누락 1건 복구</h2><p>10월 28일 기존 구매 4건을 보존하면서 <strong>와르의 누락된 20개 구매·지급 이력을 추가</strong>하고, 공동 재화를 <strong>9,550 → 4,950주화</strong>로 맞춰.</p><div class="actions"><button class="btn secondary" id="backup" disabled>수정 전 Firebase 장부 백업</button><button class="btn" id="repair" disabled>와르 누락 4,600주화 차감·기록 복구 (1회)</button></div><p class="small">서버 기록이 예상과 다르거나 이미 정정됐으면 버튼이 잠겨. 두 번 차감되지 않도록 처리해.</p></div>
 <p class="small">정정 후 <a href="rewards.html">보상·재화 관리 페이지</a>에서 잔액과 와르의 지급 완료 기록을 확인해 줘. 본 페이지 자체는 문파원 공개 메뉴에 노출되지 않아.</p>
 </main><script type="module">
 // PARTY guild: one-time, append-only repair of the 2026-10-28 Wa-reward purchase.
@@ -54,14 +54,17 @@ function assessment(reward,draws,balances,attendance){
  const marker=r.ledger.find(l=>l.reconciliationId===FIX)||waRequests.find(q=>q.reconciliationId===FIX);
  const waCharges=r.ledger.filter(l=>Number(l.change)===-COST&&str(l.note).includes('와르'));
  const purchaseRecords=r.ledger.filter(l=>l.change===-COST&&normalizeName(l.note).includes('상점구매:가호주머니×20'));
+ const oct28Purchases=purchaseRecords.filter(l=>sameDay(l.date));
+ const otherPurchases=purchaseRecords.filter(l=>!sameDay(l.date));
  const person=(attendance?.members||[]).find(m=>m.name==='와르');
- if(r.balance===AFTER&&marker)return {kind:'done',reward:r,draw:d,balances:b,person,item,purchaseRecords};
+ if(r.balance===AFTER&&marker)return {kind:'done',reward:r,draw:d,balances:b,person,item,purchaseRecords,oct28Purchases,otherPurchases};
  if(r.balance!==BEFORE)throw Error(`현재 서버 잔액이 ${fmt(r.balance)}주화야. 예상한 ${fmt(BEFORE)}주화와 달라서 자동 수정하면 안 돼.`);
  if(marker||waRequests.length||waCharges.length)throw Error('와르의 구매·보정 기록이 이미 일부 있어. 중복 차감을 막기 위해 수정 중단.');
- if(purchaseRecords.length!==4)throw Error(`기존 4건의 가호주머니 구매 내역 대신 ${purchaseRecords.length}건이 확인됐어. 임의 정정하지 않을게.`);
- const expected=r.requests.filter(q=>['철통','쭉','비녀님','단문'].includes(q.memberName)&&normalizeName(q.itemName)==='가호주머니'&&q.qty===QTY&&['paid','purchased'].includes(q.status));
- if(expected.length!==4)throw Error('기존 4명 구매·지급 기록과 장부가 일치하지 않아. 먼저 확인해야 해.');
- return {kind:'ready',reward:r,draw:d,balances:b,person,item,purchaseRecords};
+ if(oct28Purchases.length!==4)throw Error(`10월 28일 가호주머니 구매는 4건이어야 하는데 ${oct28Purchases.length}건이야 (전체 ${purchaseRecords.length}건, 다른 날짜 ${otherPurchases.length}건). 안전을 위해 차감하지 않을게.`);
+ if(otherPurchases.some(l=>!l.date||l.date<'2026-10-28'))throw Error('10월 28일보다 오래된 추가 구매가 확인돼서 자동 차감은 보류할게.');
+ const expected=r.requests.filter(q=>sameDay(q.date)&&['철통','쭉','비녀님','단문'].includes(q.memberName)&&normalizeName(q.itemName)==='가호주머니'&&q.qty===QTY&&['paid','purchased'].includes(q.status));
+ if(expected.length!==4||new Set(expected.map(q=>q.memberName)).size!==4)throw Error('10월 28일 기존 4명 구매·지급 기록과 장부가 일치하지 않아. 먼저 확인해야 해.');
+ return {kind:'ready',reward:r,draw:d,balances:b,person,item,purchaseRecords,oct28Purchases,otherPurchases};
 }
 const oldSnap=x=>x?.exists()?x.data():null;
 function paint(info){
@@ -78,7 +81,8 @@ function paint(info){
  $('before').textContent=fmt(reward.balance)+'주화';
  $('after').textContent=fmt(info.kind==='done'?reward.balance:reward.balance-COST)+'주화';
  $('pending').textContent=fmt(balances.total_pending_coins)+'주화 (유지)';
- $('count').textContent=`당첨 6명 · 기존 구매 4건${info.kind==='done'?' · 와르 누락 구매 복원 완료':''}`;
+ $('count').textContent=`당첨 6명 · 10월 28일 구매 ${info.oct28Purchases.length}건${info.kind==='done'?' · 와르 누락 구매 복원 완료':''}`;
+ $('purchaseAudit').textContent=`다른 날짜의 구매 ${info.otherPurchases.length}건 (${info.otherPurchases.map(l=>l.date).join(', ')||'없음'})은 정상 장부에 그대로 보존돼. 전체 가호주머니 구매 ${info.purchaseRecords.length}건. ${info.kind==='ready'?'10월 28일 기록 4건만 비교해 중복을 확인했어.':''}`;
 }
 async function audit(){
  if(running)return;
@@ -95,7 +99,7 @@ async function audit(){
   paint(info);
   $('backup').disabled=false;
   if(info.kind==='done')msg('✅ 이미 복구된 기록이야. 와르 당첨·지급 이력과 재화 차감이 보존됐어. 추가 차감 없음.','ok');
-  else msg('✅ 누락 내역 확인됨. 먼저 백업을 다운로드한 다음, 와르의 4,600주화 차감을 한 번만 복원할 수 있어.','ok');
+  else msg(`✅ 10월 28일 기존 구매 4건 확인 · 다른 날짜 구매 ${info.otherPurchases.length}건 별도 보존. 와르 구매 내역은 아직 없음. 먼저 백업한 뒤 누락된 4,600주화를 한 번만 복원할 수 있어.`, 'ok');
  }catch(e){msg('⛔ 자동 복구 차단: '+(e.code||e.message),'error');}
 }
 function download(obj,filename){const url=URL.createObjectURL(new Blob([JSON.stringify(obj,null,2)],{type:'application/json;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),20000);}
@@ -140,11 +144,11 @@ async function repair(){
  }catch(e){msg('⛔ 정정 결과 확인 필요: '+(e.code||e.message)+'\n반복 클릭하지 말고 Firebase 장부를 다시 조회해 줘.','error');}
  finally{running=false;$('backup').disabled=!last;$('repair').disabled=true;}
 }
-$('login').onclick=async()=>{try{await login();await audit()}catch(e){msg('관리자 로그인 오류: '+(e.code||e.message),'error')}};
+$('login').onclick=async()=>{try{await login();$('login').textContent='✅ 관리자 인증됨 · 다시 점검';await audit()}catch(e){msg('관리자 로그인 오류: '+(e.code||e.message),'error')}};
 $('audit').onclick=audit;
 $('backup').onclick=backup;
 $('repair').onclick=repair;
 await waitAuth();
-if(isAdmin())await audit();else msg('관리자 로그인 후 누락 구매를 점검할 수 있어.');
+if(isAdmin()){$('login').textContent='✅ 관리자 인증됨 · 다시 점검';await audit()}else msg('관리자 로그인 후 누락 구매를 점검할 수 있어.');
 
 </script></body></html>
