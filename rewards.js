@@ -1,12 +1,13 @@
 (()=>{'use strict';
 const $=id=>document.getElementById(id),KEY='party-guild-v12-rewards',ATT='party-guild-v11-attendance';
+let liveAttendance=null;
 const today=()=>{const d=new Date(),pad=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`};
 const uid=()=>crypto?.randomUUID?.()||('id'+Date.now()+Math.random().toString(36).slice(2));
 const initial=()=>({version:1,balance:0,items:[],requests:[],ledger:[]});let state;
-try{const parsed=JSON.parse(localStorage.getItem(KEY));state=validate(parsed)}catch{state=initial()}
+state=initial();
 function validate(s){if(!s||s.version!==1||!Number.isSafeInteger(s.balance)||s.balance<0||!Array.isArray(s.items)||!Array.isArray(s.requests)||!Array.isArray(s.ledger)||s.items.length>1000||s.requests.length>10000||s.ledger.length>30000)throw Error('보상 장부 형식 오류');const items=s.items.map(i=>{if(typeof i.id!=='string'||typeof i.name!=='string'||i.name.length>80||!Number.isSafeInteger(i.price)||i.price<0||!Number.isSafeInteger(i.stock)||i.stock<0)throw Error('아이템 오류');return {id:i.id,name:i.name,price:i.price,stock:i.stock}});const requests=s.requests.map(r=>{if(typeof r.id!=='string'||typeof r.memberId!=='string'||typeof r.memberName!=='string'||typeof r.itemName!=='string'||!Number.isSafeInteger(r.qty)||r.qty<1||!['requested','purchased','paid'].includes(r.status)||typeof r.date!=='string'||(r.price!==undefined&&(!Number.isSafeInteger(r.price)||r.price<0)))throw Error('지급 요청 오류');return {...r}});const ledger=s.ledger.map(l=>{if(typeof l.date!=='string'||typeof l.note!=='string'||!Number.isSafeInteger(l.change)||!Number.isSafeInteger(l.after))throw Error('장부 오류');return {...l}});return {version:1,balance:s.balance,items,requests,ledger}}
-function attData(){try{const x=JSON.parse(localStorage.getItem(ATT));if(x&&Array.isArray(x.members)&&Array.isArray(x.sessions)&&x.attendance&&typeof x.attendance==='object')return x}catch{}return {members:[],sessions:[],attendance:{}}}
-function persist(){try{window.PARTY_HISTORY?.beforeSave(KEY,JSON.stringify(state));localStorage.setItem(KEY,JSON.stringify(state));$('saveMsg').textContent='브라우저 저장 완료';return true}catch(e){alert('저장 실패: '+e.message+'\n브라우저 저장 공간을 확인해 줘.');$('saveMsg').textContent='저장 실패';return false}}
+function attData(){return liveAttendance||{members:[],sessions:[],attendance:{}}}
+function persist(){const cloud=window.PARTY_REWARDS_CLOUD;if(!cloud?.isReady()){alert('Firebase 서버 장부 연결이 완료되지 않았어. 저장을 중단했어.');return false}if(!cloud.enqueue(state)){alert('Firebase 임시 저장에 실패했어.');return false}return true}
 function mutate(fn){const prev=JSON.stringify(state);try{fn();if(!persist()){state=JSON.parse(prev);return}render()}catch(e){state=JSON.parse(prev);alert(e.message)}}
 function nonnegative(id,zero=false){const n=Number($(id).value);if(!Number.isSafeInteger(n)||(zero?n<0:n<=0))throw Error('수량은 '+(zero?'0 이상':'1 이상')+'의 정수로 입력해 줘.');return n}
 function weekStart(date){const d=new Date(date+'T12:00:00');if(isNaN(d))return null;d.setDate(d.getDate()-(d.getDay()+6)%7);const yy=d.getFullYear(),mm=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');return `${yy}-${mm}-${dd}`}
@@ -28,11 +29,8 @@ $('addItem').onclick=()=>{try{const name=$('itemName').value.trim(),price=nonneg
 $('addRequest').onclick=()=>{try{const a=attData(),member=a.members.find(m=>m.id===$('memberSelect').value&&m.active),item=state.items.find(i=>i.id===$('itemSelect').value),qty=nonnegative('requestQty');if(!member||!item)throw Error('활동 문파원과 아이템을 먼저 선택해 줘.');mutate(()=>state.requests.push({id:uid(),memberId:member.id,memberName:member.name,itemId:item.id,itemName:item.name,qty,date:today(),status:'requested'}))}catch(e){alert(e.message)}};
 $('backup').onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=`party-rewards-${today()}.json`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),3000)};
 
-$('resetRewards').onclick=()=>{
- const yes=prompt('보상 장부를 완전히 초기화하면 재화 잔액, 상점 목록, 신청 및 지급 기록이 지워져. 출석 기록은 유지돼.\nJSON 백업을 먼저 다운로드한 뒤, 정말 초기화하려면 확인창에 초기화 라고 입력해 줘.');
- if(yes!=='초기화')return;
- if(!confirm('최종 확인: 현재 이 브라우저의 보상 장부를 비울까? 이 작업은 JSON 백업 없이는 복구할 수 없어.'))return;
- const before=state;state=initial();if(!persist()){state=before;return}render();alert('보상 장부만 초기화했어. 출석 기록과 홈페이지 데이터는 그대로야.');
-};
-$('restore').onchange=async()=>{const f=$('restore').files?.[0];if(!f)return;try{if(f.size>5e6)throw Error('파일 용량 제한 초과');const x=validate(JSON.parse(await f.text()));if(!confirm('현재 보상 장부 전체를 백업 파일로 덮어쓸까?'))return;const old=state;state=x;if(!persist()){state=old;return}render();alert('장부를 불러왔어.')}catch(e){alert('복구 실패: '+e.message)}finally{$('restore').value=''}};
+$('resetRewards').disabled=true;$('resetRewards').title='Firebase 운영 장부 보호를 위해 전체 초기화를 잠갔어.';
+$('restore').disabled=true;
+window.PARTY_REWARDS_APP={validate,set:data=>{state=validate(data);render()},setAttendance:a=>{liveAttendance=a;render()},lock:()=>{document.querySelector('main.wrap').inert=true},unlock:()=>{document.querySelector('main.wrap').inert=false}};
+document.querySelector('main.wrap').inert=true;
 render();})();

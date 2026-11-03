@@ -78,5 +78,6 @@ $('download').onclick=async()=>{
  const blob=new Blob(['window.PARTY_LOTTERY_RESULTS = '+json+';\n'],{type:'text/javascript;charset=utf-8'});
  try{const result=await guildSave('lottery-results-data.js',blob);$('status').textContent=guildSaveNotice(result,'lottery-results-data.js')}catch(e){const error=guildSaveError(e);if(error)$('status').textContent='저장 실패: '+error}
 };
+window.PARTY_LOTTERY_EDITOR={get:()=>structuredClone(items),set:incoming=>{items=structuredClone(incoming);render()}};
 render();
 })();

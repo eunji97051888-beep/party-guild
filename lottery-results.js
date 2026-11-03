@@ -1,6 +1,6 @@
 (()=>{'use strict';
 const el=document.getElementById('lotteryResults'),filter=document.getElementById('lotteryMonthFilter');if(!el)return;
-const entries=Array.isArray(window.PARTY_LOTTERY_RESULTS)?window.PARTY_LOTTERY_RESULTS:[];
+let entries=Array.isArray(window.PARTY_LOTTERY_RESULTS)?window.PARTY_LOTTERY_RESULTS:[];
 const monthOf=item=>/^\d{4}-\d{2}$/.test(item.settlement_period||'')?item.settlement_period:String(item.started_at_kst||'').slice(0,7);
 function text(tag,cls,value){const e=document.createElement(tag);if(cls)e.className=cls;e.textContent=value??'';return e}
 function time(v){if(!v)return '미기록';const d=new Date(v);return Number.isNaN(d.getTime())?String(v):new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(d)}
@@ -22,8 +22,11 @@ function render(){
  }
  if(location.hash){try{document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView()}catch(e){}}
 }
-if(filter){for(const m of [...new Set(entries.map(monthOf).filter(v=>/^\d{4}-\d{2}$/.test(v)))].sort().reverse()){
+function buildMonths(){if(!filter)return;const selected=filter.value;filter.replaceChildren();const all=document.createElement('option');all.value='all';all.textContent='전체 기간';filter.append(all);for(const m of [...new Set(entries.map(monthOf).filter(v=>/^\d{4}-\d{2}$/.test(v)))].sort().reverse()){
  const o=document.createElement('option');o.value=m;o.textContent=`${m.slice(0,4)}년 ${Number(m.slice(5))}월 정산`;filter.append(o)}
- filter.addEventListener('change',render)}
-render();
+ if([...filter.options].some(x=>x.value===selected))filter.value=selected;
+}
+filter?.addEventListener('change',render);
+window.addEventListener('party-lottery-draws',e=>{entries=e.detail;buildMonths();render()});
+buildMonths();render();
 })();
