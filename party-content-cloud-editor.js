@@ -29,9 +29,7 @@ if(kind){
   try{
    const data=validate(kind,await api().get());
    if(same(data,lastData)){msg('✅ 서버에 저장된 내용과 같아 · 추가 저장 필요 없음');return;}
-   if(kind!=='activity'&&!confirm('Firebase에 변경사항을 게시할까?
-기존 서버 버전 '+revision+' → '+(revision+1)+'
-이전 버전은 관리자 백업 문서로 보존돼.'))return;
+   if(kind!=='activity'&&!confirm('Firebase에 변경사항을 게시할까?\n기존 서버 버전 '+revision+' → '+(revision+1)+'\n이전 버전은 관리자 백업 문서로 보존돼.'))return;
    msg('Firebase에 저장하고 서버에서 재조회 중…');
    const next=await save(kind,data,revision);revision=next;lastData=data;
    msg('✅ Firebase 저장·서버 검증 완료 · 버전 '+revision+' · 공개 홈페이지 자동 갱신');
