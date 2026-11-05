@@ -30,7 +30,7 @@ const statusKey=raw=>Object.prototype.hasOwnProperty.call(labels,raw)?raw:'missi
 const dateText=raw=>{if(!/^\d{4}-\d\d-\d\d$/.test(raw||''))return raw||'날짜 미지정';const d=new Date(raw+'T12:00:00');return Number.isNaN(d.getTime())?raw:d.toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'})};
 const stat=s=>{const result={present:0,absent:0,exempt:0,missing:0};for(const m of s.members||[])result[statusKey(m.status)]++;return result};
 const requestedDate=new URLSearchParams(window.location.search).get('date')||'';
-let sessions=[],dates=[],activeDate='',activeSession=null,activeFilter='all',lastOpener=null;
+let sessions=[],dates=[],activeDate='',activeSession=null,activeFilter='all',lastOpener=null;let userSelectedDate=false;
 function showError(message){stamp.textContent=message;area.replaceChildren(mk('p','empty','출석 정보를 가져오지 못했어. 페이지를 새로고침해도 계속된다면 문주에게 알려줘.'));dateSelect.disabled=older.disabled=newer.disabled=true;}
 function prepare(raw){
  if(!raw||!Array.isArray(raw.sessions)){showError('공개 출석 데이터를 불러오지 못했어.');return}
@@ -117,9 +117,9 @@ function closeDetail(){if(dialog.open&&typeof dialog.close==='function')dialog.c
 $('closeDialog').addEventListener('click',closeDetail);$('bottomCloseDialog').addEventListener('click',closeDetail);
 dialog.addEventListener('close',()=>{document.body.style.overflow='';lastOpener?.focus()});
 dialog.addEventListener('click',e=>{if(e.target===dialog)closeDetail()});
-dateSelect.addEventListener('change',()=>{activeDate=dateSelect.value;renderDate()});
-older.addEventListener('click',()=>{const idx=dates.indexOf(activeDate);if(idx<dates.length-1){activeDate=dates[idx+1];renderDate()}});
-newer.addEventListener('click',()=>{const idx=dates.indexOf(activeDate);if(idx>0){activeDate=dates[idx-1];renderDate()}});
+dateSelect.addEventListener('change',()=>{userSelectedDate=true;activeDate=dateSelect.value;renderDate()});
+older.addEventListener('click',()=>{const idx=dates.indexOf(activeDate);if(idx<dates.length-1){userSelectedDate=true;activeDate=dates[idx+1];renderDate()}});
+newer.addEventListener('click',()=>{const idx=dates.indexOf(activeDate);if(idx>0){userSelectedDate=true;activeDate=dates[idx-1];renderDate()}});
 // Stage 7 public page: published Firebase public document is the only data source.
 // The old attendance-public-data.js and original attendance-view.js remain available for rollback.
 (async()=>{
@@ -138,11 +138,12 @@ newer.addEventListener('click',()=>{const idx=dates.indexOf(activeDate);if(idx>0
    if(wrapper.format!=='party-attendance-public-v2'||raw?.version!==2||!Array.isArray(raw.sessions)){
     showError('Firebase 공개 출석 데이터 형식이 올바르지 않아.');return;
    }
-   // Fresh server-backed updates render automatically. Preserve the selected date.
+   // Firebase first sends cached data, then the up-to-date server data.
+   // Never pin a stale cached date unless the visitor explicitly selected it.
    if(dialog.open)closeDetail();
    const oldDate=activeDate;
    prepare(raw);
-   if(dates.includes(oldDate)){
+   if(userSelectedDate && dates.includes(oldDate)){
     activeDate=oldDate;renderDate();
    }
    if(snap.metadata.fromCache){stamp.textContent+=' · 네트워크 확인 중(임시 캐시)';}
