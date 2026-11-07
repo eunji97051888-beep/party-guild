@@ -42,3 +42,6 @@ if(kind){
  if(kind==='activity')window.addEventListener('party-activity-editor-changed',()=>{if(revision!==null&&!blocked)publish()});
  lock(true);await waitAuth();await load();
 }
+
+// PARTY official news: inject one-click controls without editing admin.html.
+import('./party-official-news-admin.js').catch(e=>console.warn('공식 공지 편집기 보조 모듈 연결 실패:',e));
