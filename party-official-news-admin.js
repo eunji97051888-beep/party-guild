@@ -1,6 +1,6 @@
 // PARTY official notices one-click controller · Firebase admin + localhost collector
-import {db,isAdmin,login,waitAuth,read,runTransaction,serverTimestamp} from './party-firebase-shared.js';
-import {doc} from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js';
+import {db,isAdmin,login,waitAuth,runTransaction,serverTimestamp} from './party-firebase-shared.js';
+import {doc,getDocFromServer} from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js';
 
 const OFFICIAL='https://forum.kakaogames.com';
 const LOCAL='http://127.0.0.1:8765';
@@ -14,12 +14,14 @@ if(root){
   <p style="line-height:1.7">처음 한 번만 Windows 수집기 보조 프로그램을 설치하면, 이후에는 CMD·GitHub 업로드 없이 최신 공식 공지를 수집하고 Firebase에 게시해. <strong>설치한 PC가 켜져 있어야 해.</strong></p>
   <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
    <button type="button" id="partyNewsOneClick" style="padding:12px 17px;border-radius:8px;border:0;background:#e7bb75;color:#152032;font-weight:800;cursor:pointer">🔄 공식 공지 지금 업데이트</button>
+   <button type="button" id="partyNewsServerCheck" style="padding:12px 17px;border-radius:8px;border:1px solid #b89a62;background:#374966;color:#f6dca8;font-weight:800;cursor:pointer">☁ Firebase 저장 상태 확인 (수집 안 함)</button>
    <a href="index.html#official-news" style="color:#f6dca8">홈페이지 공지 확인 ↗</a>
   </div>
   <p id="partyNewsOneClickStatus" role="status" style="margin-top:14px;color:#e3dfd4;white-space:pre-wrap">준비 완료. Windows 보조 수집기가 실행 중이면 버튼 한 번으로 갱신할 수 있어.</p>`;
  const first=root.querySelector('.panel');
  if(first)first.before(panel);else root.prepend(panel);
  const btn=panel.querySelector('#partyNewsOneClick');
+ const check=panel.querySelector('#partyNewsServerCheck');
  const status=panel.querySelector('#partyNewsOneClickStatus');
  const say=(t,err=false)=>{status.textContent=t;status.style.color=err?'#ffb8ac':'#bdf0ce'};
  let busy=false;
@@ -31,9 +33,33 @@ if(root){
   if(!items.length)throw Error('정상적인 공식 공지 링크가 없어서 게시하지 않았어.');
   return {updated_at:typeof x.updated_at==='string'&&Number.isFinite(Date.parse(x.updated_at))?x.updated_at:new Date().toISOString(),items:items.slice(0,12)};
  };
- function same(a,b){return JSON.stringify(a?.items)===JSON.stringify(b?.items)}
+ // Firestore can reorder object fields; compare the meaningful ordered title/url pairs only.
+ // An identical notice list must not be rejected because JSON property insertion order changed.
+ function same(a,b){
+  if(!Array.isArray(a?.items)||!Array.isArray(b?.items)||a.items.length!==b.items.length)return false;
+  return a.items.every((n,i)=>String(n?.title||'')===String(b.items[i]?.title||'')&&String(n?.url||'')===String(b.items[i]?.url||''));
+ }
+ async function serverState(){
+  // Explicit server read: do not mistake a cached older snapshot for failed post-write verification.
+  const snap=await getDocFromServer(DEST);
+  if(!snap.exists())return {exists:false,revision:0,data:null};
+  const obj=snap.data();
+  if(obj?.format!=='party-official-news-v1')throw Error('서버에 다른 형식의 공지 문서가 있어. 수정하지 않았어.');
+  return {exists:true,revision:obj.revision||0,data:obj.data||null};
+ }
+ check.addEventListener('click',async()=>{
+  if(busy)return;busy=true;check.disabled=true;btn.disabled=true;
+  try{
+   const state=await serverState();
+   if(!state.exists){say('☁ 아직 Firebase 공지 게시 문서가 없어. 기존 GitHub 공지를 계속 표시 중이야.');return;}
+   const count=Array.isArray(state.data?.items)?state.data.items.length:0;
+   const date=state.data?.updated_at&&Number.isFinite(Date.parse(state.data.updated_at))?new Date(state.data.updated_at).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'}):'확인 불가';
+   say(`✅ Firebase 공지 저장 확인 · 버전 ${state.revision} · ${count}개 · 수집 시각 ${date}\n이 버튼은 수집·저장하지 않고 서버 상태만 확인했어.`);
+  }catch(e){say('⛔ 서버 조회 실패: '+(e?.code||e?.message||e),true)}
+  finally{busy=false;check.disabled=false;btn.disabled=false}
+ });
  async function publish(data){
-  const prior=await read(DEST);
+  const prior=await getDocFromServer(DEST);
   const previous=prior.exists()?prior.data():null;
   if(previous&&previous.format!=='party-official-news-v1')throw Error('서버에 다른 형식의 공지 문서가 있어. 안전을 위해 덮어쓰지 않았어.');
   const prevData=previous?.data;
@@ -49,8 +75,8 @@ if(root){
    if(history)tx.set(history,{format:'party-official-news-history-v1',revision,data:prevData,archivedAt:serverTimestamp()});
    tx.set(DEST,{format:'party-official-news-v1',revision:revision+1,data,updatedAt:serverTimestamp()});
   });
-  const verified=await read(DEST);
-  if(!verified.exists()||verified.data().revision!==revision+1||!same(verified.data().data,data))throw Error('서버 검증 실패. 다시 실행하기 전에 서버 데이터를 확인해 줘.');
+  const verified=await serverState();
+  if(!verified.exists||verified.revision!==revision+1||!same(verified.data,data))throw Error('서버 재조회에서 게시 결과를 확인하지 못했어. 중복 수집하지 말고 먼저 「Firebase 저장 상태 확인」을 눌러 줘.');
   return {unchanged:false,count:data.items.length,revision:revision+1};
  }
  async function collect(){
@@ -66,7 +92,7 @@ if(root){
   }finally{clearTimeout(timeout)}
  }
  btn.addEventListener('click',async()=>{
-  if(busy)return;busy=true;btn.disabled=true;
+  if(busy)return;busy=true;btn.disabled=true;check.disabled=true;
   try{
    if(!isAdmin()){say('문주 Google 계정을 확인하는 중…');await login();}
    if(!isAdmin())throw Error('문주 관리자 계정으로 로그인해야 해.');
@@ -80,7 +106,7 @@ if(root){
    const msg=e?.name==='AbortError'?'수집 제한 시간을 넘었어. 기존 서버 공지는 유지됐어.':(e?.code||e?.message||String(e));
    const help=/fetch|network|failed/i.test(msg)?'Windows 보조 프로그램이 실행 중인지 확인해 줘. 브라우저가 로컬 네트워크 접근을 물으면 허용해야 해.':'해당 오류를 확인하고 재시도해 줘.';
    say(`⛔ 공지 갱신 실패: ${msg}\n${help}`,true);
-  }finally{busy=false;btn.disabled=false}
+  }finally{busy=false;btn.disabled=false;check.disabled=false}
  });
  waitAuth().then(()=>{if(isAdmin())say('✅ 관리자 로그인 확인됨 · 공식 공지 갱신 버튼을 사용할 수 있어.');});
 }
