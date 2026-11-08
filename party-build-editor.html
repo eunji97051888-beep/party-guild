@@ -4,13 +4,14 @@
 <a href="admin.html">← 문주 관리자 돌아가기</a>
 <h1>⚔ 직접써보고 검증해본 도술빌드</h1>
 <p class="muted">글을 짧은 제목으로 등록하면 문파 홈페이지에서 목록만 보이고, 제목을 누를 때 사진과 설명이 팝업으로 열려요.</p>
-<div class="notice">현재 문파 사이트 방식에 맞춰 <b>무료 GitHub 게시 방식</b>으로 운영해요. 사진과 글을 작성한 뒤 <b>이 글 저장</b> → <b>JS 파일 다운로드</b> → <b>GitHub에 덮어쓰기</b>까지 해야 공개돼요.</div>
+<div class="notice"><b>Firebase 자동 게시</b>로 변경됐어요. 문주 Google 계정으로 로그인한 뒤 글을 저장하면 홈페이지에 자동 반영됩니다. GitHub에 JS 파일을 다시 올릴 필요가 없어요.</div>
+<section class="box cloud-editor"><h2>☁ Firebase 도술빌드 관리</h2><p class="muted">최초 등록은 한 번만 진행합니다. 기존 글을 지우거나 다른 Firebase 자료를 변경하지 않아요.</p><button type="button" id="cloudLogin">Google 문주 로그인</button><button type="button" class="secondary" id="cloudReload">서버 글 다시 읽기</button><button type="button" id="cloudInit" hidden>기존 글 Firebase 최초 등록 (1회)</button><p id="cloudStatus" role="status" class="muted">로그인 확인 중...</p></section>
 <section class="box"><h2>등록한 도술빌드</h2><div id="postList"></div><button class="secondary" id="newPost" type="button">+ 새 도술빌드 작성</button></section>
 <section class="box"><h2>빌드 내용 작성·수정</h2>
 <label for="title">목록에 표시할 이름 *</label><input id="title" maxlength="100" placeholder="예: 활 사냥 도술빌드 / 보스전 검 도술빌드">
 <label for="date">작성 날짜 *</label><input id="date" type="date">
 <label for="image">도술빌드 사진 (가로로 긴 이미지 가능)</label><input id="image" type="file" accept="image/jpeg,image/png,image/webp"><span class="hint">사진 1장 · JPG/PNG/WebP · 18MB 이하. 사진 크기는 비율을 유지해 자동 압축해요. 수정할 때 사진을 다시 선택하지 않으면 그대로 유지돼요.</span><img id="imgPreview" alt="빌드 사진 미리보기"><button id="removeImage" class="secondary" type="button">사진 지우기</button>
 <label for="body">사진 밑에 들어갈 설명글</label><textarea id="body" maxlength="5000" placeholder="사용 무기, 도술 사용 순서, 사냥/보스/PvP 용도, 직접 써본 후기 등을 적어 주세요."></textarea>
-<div><button id="savePost" type="button">이 글 저장</button><button id="deletePost" class="danger" type="button">선택한 글 삭제</button></div><p id="status" role="status"></p></section>
-<section class="box"><h2>홈페이지에 게시하기</h2><p class="muted">아래 버튼으로 다운로드한 <b>party-build-data.js</b>를 GitHub 저장소 최상위에 있는 같은 이름의 파일에 올리고 <b>Commit changes</b>를 눌러 주세요. 편집기에서 저장만 누르면 공개되지 않아요.</p><button id="export" type="button">⬇ party-build-data.js 다운로드</button><p class="muted">사진도 다운로드되는 JS 파일 안에 들어갑니다. 개인 정보가 보이는 스크린샷은 등록하지 마세요. 너무 많은 사진은 사이트 파일 용량이 커질 수 있어요.</p></section>
-</main><script src="party-build-data.js"></script><script src="party-build-editor.js"></script></body></html>
+<div><button id="savePost" type="button">☁ 이 글 Firebase에 저장</button><button id="deletePost" class="danger" type="button">선택한 글 삭제</button></div><p id="status" role="status"></p></section>
+<details class="box"><summary><b>📦 비상용 JS 백업 다운로드 (선택)</b></summary><p class="muted">평소에는 필요하지 않습니다. 서버에 저장된 내용을 파일로 따로 보관할 때만 사용하세요.</p><button id="export" type="button" class="secondary">⬇ party-build-data.js 백업</button><p class="muted">개인정보가 보이는 스크린샷은 등록하지 마세요. Firebase 문서 전체는 안전을 위해 700KB 이하로 제한합니다.</p></details>
+</main><script src="party-build-data.js"></script><script type="module" src="party-build-editor.js?v=2"></script></body></html>

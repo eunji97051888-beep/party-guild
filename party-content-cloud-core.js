@@ -4,7 +4,8 @@ import {doc} from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.
 const definitions={
  home:{name:'문파 공지·안내·일정·자료실·유튜브',ref:doc(db,'publicContent','siteHomeLiveV1'),history:'siteHome'},
  activity:{name:'문파 활동 소식',ref:doc(db,'publicContent','activityNewsLiveV1'),history:'activityNews'},
- weekly:{name:'주간 플래너',ref:doc(db,'publicContent','weeklyBoardLiveV1'),history:'weeklyBoard'}
+ weekly:{name:'주간 플래너',ref:doc(db,'publicContent','weeklyBoardLiveV1'),history:'weeklyBoard'},
+ builds:{name:'검증 도술빌드',ref:doc(db,'publicContent','partyBuildsLiveV1'),history:'partyBuilds'}
 };
 function validate(kind,v){
  if(kind==='home'){
@@ -13,6 +14,10 @@ function validate(kind,v){
  }else if(kind==='activity'){
   if(!Array.isArray(v)||v.length>180||v.some(p=>!p||typeof p.id!=='string'||typeof p.title!=='string'||typeof p.date!=='string'||!Array.isArray(p.photos)||p.photos.length>3))throw Error('활동 소식 데이터 구조 오류');
   if(v.some(p=>p.photos.some(x=>typeof x!=='string'||!/^data:image\/(jpeg|png|webp);base64,/i.test(x))))throw Error('소식 사진 자료 오류');
+ }else if(kind==='builds'){
+  if(!Array.isArray(v)||v.length>120||v.some(p=>!p||typeof p.id!=='string'||!p.id||typeof p.title!=='string'||!p.title.trim()||p.title.length>100||typeof p.date!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(p.date)||typeof p.body!=='string'||p.body.length>5000||typeof p.image!=='string'))throw Error('도술빌드 데이터 구조 오류');
+  const ids=v.map(p=>p.id);if(new Set(ids).size!==ids.length)throw Error('빌드 식별자가 중복됐어.');
+  if(v.some(p=>p.image && !/^data:image\/(?:jpeg|png|webp);base64,[a-z0-9+/=]+$/i.test(p.image) && !/^(?:\.\/?|[\w-])[\w./%()\- ]+\.(?:png|jpg|jpeg|webp)(?:\?v=\d+)?$/i.test(p.image)))throw Error('이미지 자료 형식 오류');
  }else if(kind==='weekly'){
   if(!v||v.version!==2||!Array.isArray(v.items)||v.items.length>60||v.items.some(i=>!i||typeof i.title!=='string'||!i.title.trim()||!Array.isArray(i.days)||i.days.some(d=>!Number.isInteger(d)||d<0||d>6)))throw Error('플래너 데이터 형식 오류');
  }else throw Error('알 수 없는 장부 종류');

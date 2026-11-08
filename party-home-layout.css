@@ -1,0 +1,33 @@
+/* PARTY home: full-width attendance summary + equal-width announcements and builds. */
+.party-activity-wide{margin:18px 0 16px;min-width:0}
+.party-activity-wide .panel-title{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.party-activity-wide .panel-title>div{flex:1 1 220px;min-width:0}
+.party-activity-wide .panel-title h3{font-size:clamp(18px,1.65vw,24px);overflow-wrap:anywhere}
+.party-activity-wide .panel-sub{margin:9px 0 17px}
+.party-attendance-all{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;flex-shrink:0;padding:9px 13px;border-radius:9px;border:1px solid rgba(227,185,118,.57);background:rgba(63,73,99,.6);color:#ffdf9f;font-size:13px;font-weight:700}
+.party-attendance-all:hover{border-color:#f1d6a5}
+.party-attendance-highlights{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;min-width:0}
+.party-attendance-tile{display:flex;flex-direction:column;gap:11px;text-decoration:none;min-width:0;min-height:159px;padding:17px 18px;border:1px solid rgba(223,183,117,.42);border-radius:13px;background:linear-gradient(125deg,rgba(45,57,79,.96),rgba(24,39,61,.98));transition:border-color .16s,transform .16s}
+.party-attendance-tile:hover,.party-attendance-tile:focus-visible{border-color:#f4cf92;transform:translateY(-2px)}
+.party-attendance-kicker{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#c5d1de;font-size:11px}
+.party-attendance-tile strong{display:block;overflow-wrap:anywhere;font-size:clamp(15px,1.45vw,19px);color:#ffe2aa;line-height:1.4}
+.party-attendance-summary{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;color:#b5cad5;font-size:12px}
+.party-attendance-summary b{color:#9ae8bf;font-size:clamp(23px,2.7vw,34px);font-variant-numeric:tabular-nums}
+.party-attendance-foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:8px;color:#d3d2e0;font-size:12px}
+.party-attendance-foot span:last-child{color:#edd09c}
+.party-attendance-loading{grid-column:1/-1;padding:28px;border:1px dashed #80728b;border-radius:12px;color:#ccd4e0}
+.party-activity-archive{margin-top:16px;border-top:1px solid #ffffff20;padding-top:10px}
+.party-activity-archive>summary{color:#eed19d;font-weight:700;font-size:13px;cursor:pointer;padding:11px 6px}
+.party-activity-archive[open]>summary{margin-bottom:6px}
+.party-activity-archive .activity-news-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;max-height:540px;overflow-y:auto;margin:12px 0}
+.party-home-lower{margin:0 0 24px}
+.party-home-lower>.panel{height:380px;min-width:0}
+.party-home-lower .guild-announcements{margin-top:0!important}
+.party-home-lower .notice-items{min-height:0;overflow-y:auto;scrollbar-width:thin;margin-top:8px;padding-right:4px}
+.party-home-lower .party-build-list{overflow-y:auto}
+@media(max-width:950px){.party-attendance-highlights{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.party-attendance-highlights{grid-template-columns:minmax(0,1fr);gap:9px}.party-attendance-tile{min-height:115px;padding:12px 14px;gap:5px}.party-attendance-tile strong{font-size:16px}.party-attendance-summary b{font-size:23px}.party-activity-archive .activity-news-list{grid-template-columns:minmax(0,1fr)}.party-home-lower>.panel{height:auto;max-height:370px;min-height:230px}.party-home-lower .notice-items,.party-home-lower .party-build-list{max-height:255px}.party-attendance-all{font-size:12px;padding:8px 10px}}
+@media(prefers-reduced-motion:reduce){.party-attendance-tile{transition:none}}
+/* Keep the two lower panels independently scrollable when notices or builds grow. */
+.party-home-lower .notice-items{flex:1 1 auto}
+.party-home-lower .party-build-list{flex:1 1 auto}
