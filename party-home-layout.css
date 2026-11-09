@@ -6,8 +6,8 @@
 .party-activity-wide .panel-sub{margin:9px 0 17px}
 .party-attendance-all{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;flex-shrink:0;padding:9px 13px;border-radius:9px;border:1px solid rgba(227,185,118,.57);background:rgba(63,73,99,.6);color:#ffdf9f;font-size:13px;font-weight:700}
 .party-attendance-all:hover{border-color:#f1d6a5}
-.party-attendance-highlights{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;min-width:0}
-.party-attendance-tile{display:flex;flex-direction:column;gap:11px;text-decoration:none;min-width:0;min-height:159px;padding:17px 18px;border:1px solid rgba(223,183,117,.42);border-radius:13px;background:linear-gradient(125deg,rgba(45,57,79,.96),rgba(24,39,61,.98));transition:border-color .16s,transform .16s}
+.party-attendance-highlights{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;min-width:0}
+.party-attendance-tile{display:flex;flex-direction:column;gap:10px;text-decoration:none;min-width:0;min-height:155px;padding:15px 13px;border:1px solid rgba(223,183,117,.42);border-radius:13px;background:linear-gradient(125deg,rgba(45,57,79,.96),rgba(24,39,61,.98));transition:border-color .16s,transform .16s}
 .party-attendance-tile:hover,.party-attendance-tile:focus-visible{border-color:#f4cf92;transform:translateY(-2px)}
 .party-attendance-kicker{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#c5d1de;font-size:11px}
 .party-attendance-tile strong{display:block;overflow-wrap:anywhere;font-size:clamp(15px,1.45vw,19px);color:#ffe2aa;line-height:1.4}
@@ -66,4 +66,31 @@
     flex: 1 1 auto;
     max-height: 255px;
   }
+}
+
+/* 2026-11-09: Four latest unique guild activities on desktop; compact 2 x 2 on phones. */
+@media (max-width: 700px) {
+  .party-attendance-highlights {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .party-attendance-tile {
+    min-width: 0;
+    min-height: 111px;
+    padding: 10px 11px;
+    gap: 5px;
+    border-radius: 10px;
+  }
+  .party-attendance-kicker {font-size: 10px;}
+  .party-attendance-round {display:none;}
+  .party-attendance-tile strong {font-size: 14px;line-height: 1.25;}
+  .party-attendance-summary {gap: 4px;font-size: 10px;}
+  .party-attendance-summary b {font-size: 23px;line-height: 1.1;}
+  .party-attendance-foot {font-size: 10px;}
+  .party-attendance-detail-count {display:none;}
+  .party-attendance-go {margin-left:auto;}
+}
+@media (max-width: 360px) {
+  .party-attendance-tile {padding: 9px 8px;}
+  .party-attendance-tile strong {font-size: 13px;}
 }
