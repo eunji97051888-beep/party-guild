@@ -94,3 +94,46 @@
   .party-attendance-tile {padding: 9px 8px;}
   .party-attendance-tile strong {font-size: 13px;}
 }
+
+/* 2026-11-09: balance paired home panels for easier scanning.
+   Make the top daily/notice row and the lower notice/build row feel visually matched. */
+.dash-grid{
+  align-items:stretch;
+}
+.dash-grid > .panel{
+  height:100%;
+  min-height:320px;
+  display:flex;
+  flex-direction:column;
+  box-sizing:border-box;
+}
+.dash-grid > .notice .rules{
+  margin-top:auto;
+}
+.dash-grid > .daily .events{
+  flex:0 0 auto;
+}
+
+.party-home-lower{
+  align-items:stretch;
+}
+.party-home-lower > .panel{
+  display:flex;
+  flex-direction:column;
+}
+.party-home-lower .panel-title,
+.party-home-lower .panel-sub,
+.party-home-lower .chip{
+  flex-shrink:0;
+}
+.party-home-lower .notice-items,
+.party-home-lower .party-build-list{
+  flex:1 1 auto;
+  min-height:0;
+}
+
+@media (max-width: 700px){
+  .dash-grid > .panel{
+    min-height:auto;
+  }
+}
