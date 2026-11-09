@@ -138,29 +138,21 @@
   }
 }
 
-/* 2026-11-09: reduce oversized center gutter between left/right home panels. */
-.dash-grid{
-  grid-template-columns:minmax(0,1.22fr) minmax(0,0.92fr);
-  gap:12px;
-}
-.party-two-boards,
-.party-home-lower{
-  gap:12px;
-}
-@media (max-width:1000px){
-  .dash-grid{
-    grid-template-columns:minmax(0,1.12fr) minmax(0,0.88fr);
-    gap:10px;
-  }
-  .party-two-boards,
-  .party-home-lower{
-    gap:10px;
-  }
-}
-@media (max-width:700px){
+/* 2026-11-09: align upper and lower card split at the same center line.
+   Both rows use two equal columns; the center gutter stays narrow. */
+@media (min-width: 701px) {
   .dash-grid,
-  .party-two-boards,
-  .party-home-lower{
-    gap:12px;
+  .party-two-boards.party-home-lower {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 12px;
+  }
+}
+
+/* On phones, retain a single-column layout. */
+@media (max-width: 700px) {
+  .dash-grid,
+  .party-two-boards.party-home-lower {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
   }
 }
