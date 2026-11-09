@@ -31,3 +31,39 @@
 /* Keep the two lower panels independently scrollable when notices or builds grow. */
 .party-home-lower .notice-items{flex:1 1 auto}
 .party-home-lower .party-build-list{flex:1 1 auto}
+
+
+/* 2026-11-09: Prevent notice cards from shrinking into clipped horizontal strips.
+   The list scrolls, while each notice keeps its full natural height. */
+.party-home-lower .notice-items {
+  flex: 1 1 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: max-content;
+  align-content: start;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #96795c transparent;
+  gap: 11px;
+  margin-top: 8px;
+  padding: 4px 8px 8px 0;
+}
+.party-home-lower .notice-entry {
+  height: auto;
+  min-height: min-content;
+  overflow: visible;
+}
+.party-home-lower .notice-public-pager {
+  flex: 0 0 auto;
+  margin-top: 8px;
+  padding-top: 6px;
+}
+@media (max-width: 700px) {
+  .party-home-lower .notice-items {
+    flex: 1 1 auto;
+    max-height: 255px;
+  }
+}
