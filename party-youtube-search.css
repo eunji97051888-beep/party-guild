@@ -1,0 +1,31 @@
+/* PARTY YouTube selector: admin-only search; existing video list and Firestore unchanged. */
+.party-youtube-tool{margin:16px 0 22px;padding:17px;border:1px solid #9b815d;border-radius:12px;background:linear-gradient(130deg,#1d2b41,#182338);color:#eadfcb}
+.party-youtube-tool h3{margin:0 0 7px;font-size:17px;color:#f6dba8}
+.party-youtube-intro{font-size:12px;color:#c1cfe0;line-height:1.65;margin:0 0 13px}
+.party-youtube-tool label{font-weight:700;font-size:12px;color:#f0d7ac}
+.party-youtube-settings{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 12px}
+.party-youtube-settings label{flex:0 0 100%;}
+.party-youtube-settings input{min-width:0;flex:1 1 240px;width:auto}
+.party-youtube-settings button{flex:0 0 auto}
+.party-youtube-settings-note{font-size:11px;color:#adbed3;line-height:1.65;margin:2px 0 15px}
+.party-youtube-settings-note a{color:#f3d29a;text-decoration:underline}
+.party-youtube-controls{display:grid;grid-template-columns:minmax(0,1fr) 120px auto;gap:8px;align-items:end}
+.party-youtube-controls label{min-width:0;display:flex;flex-direction:column;gap:6px}
+.party-youtube-controls input,.party-youtube-controls select{box-sizing:border-box;width:100%;min-height:43px;border-radius:8px;background:#111b2b;color:#fff1dd;border:1px solid #907b61;padding:10px}
+.party-youtube-controls button{white-space:nowrap;min-height:43px}
+.party-youtube-status{margin:12px 0;color:#bce3c8;font-size:12px;line-height:1.6;min-height:18px}
+.party-youtube-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:8px}
+.party-youtube-result{display:flex;align-items:start;gap:10px;padding:11px;background:#27344d;border:1px solid #455577;border-radius:10px;cursor:pointer;min-width:0}
+.party-youtube-result:hover{border-color:#d7b77c}
+.party-youtube-result.is-registered{opacity:.58;cursor:default}
+.party-youtube-result>input{accent-color:#e4be79;margin:4px 0 0;flex:none;min-width:16px;min-height:16px}
+.party-youtube-result img{width:98px;aspect-ratio:16/9;object-fit:cover;flex:none;border-radius:6px;background:#0d1627}
+.party-youtube-info{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.party-youtube-info strong{font-size:12px;line-height:1.45;color:#f6e1b7;overflow-wrap:anywhere}
+.party-youtube-info small{font-size:11px;line-height:1.5;color:#aebed4;overflow-wrap:anywhere}
+.party-youtube-info a{font-size:11px;color:#f0ce9c;align-self:flex-start}
+.party-youtube-footer{display:flex;gap:9px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:13px}
+.party-youtube-footer .action{font-size:12px}
+.party-youtube-footer .action:disabled{opacity:.5}
+.party-youtube-count{font-size:12px;color:#d0dbeb;margin-right:auto}
+@media(max-width:680px){.party-youtube-tool{padding:12px}.party-youtube-controls{grid-template-columns:minmax(0,1fr) 105px}.party-youtube-controls button{grid-column:1/-1}.party-youtube-results{grid-template-columns:1fr}.party-youtube-result img{width:86px}.party-youtube-footer{align-items:stretch}.party-youtube-footer .action{width:100%}}
